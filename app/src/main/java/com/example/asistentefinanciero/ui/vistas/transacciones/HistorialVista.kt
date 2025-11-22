@@ -32,7 +32,8 @@ data class Transaccion(
 
 @Composable
 fun HistorialVista(
-    onVolver: () -> Unit = {}
+    onVolver: () -> Unit = {},
+    onCerrarSesion: () -> Unit
 ) {
     var tipoSeleccionado by remember { mutableStateOf(TipoHistorial.TODOS) }
 

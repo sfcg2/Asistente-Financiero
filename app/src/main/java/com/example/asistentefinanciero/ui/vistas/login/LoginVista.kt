@@ -110,7 +110,10 @@ fun LoginVista(
                             focusedBorderColor = PrimaryPurple,
                             unfocusedBorderColor = Color(0xFFE0E0E0),
                             focusedContainerColor = Color(0xFFF5F5F5),
-                            unfocusedContainerColor = Color(0xFFF5F5F5)
+                            unfocusedContainerColor = Color(0xFFF5F5F5),
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            cursorColor = PrimaryPurple
                         ),
                         shape = RoundedCornerShape(8.dp),
                         isError = mostrarError
@@ -137,7 +140,10 @@ fun LoginVista(
                             focusedBorderColor = PrimaryPurple,
                             unfocusedBorderColor = Color(0xFFE0E0E0),
                             focusedContainerColor = Color(0xFFF5F5F5),
-                            unfocusedContainerColor = Color(0xFFF5F5F5)
+                            unfocusedContainerColor = Color(0xFFF5F5F5),
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            cursorColor = PrimaryPurple
                         ),
                         shape = RoundedCornerShape(8.dp),
                         isError = mostrarError
