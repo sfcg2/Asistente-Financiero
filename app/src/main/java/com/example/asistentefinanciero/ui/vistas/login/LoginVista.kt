@@ -10,16 +10,34 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.asistentefinanciero.data.repository.UsuarioRepository
 import com.example.asistentefinanciero.ui.theme.*
 
 @Composable
-fun LoginVista() {
+fun LoginVista(
+    onLoginExitoso: () -> Unit = {},
+    onIrRegistro: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val repository = remember { UsuarioRepository(context) }
+
     var correo by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
+    var mensajeError by remember { mutableStateOf("") }
+    var mostrarError by remember { mutableStateOf(false) }
+    var cargando by remember { mutableStateOf(false) }
+
+    // Verificar si ya hay sesión activa
+    LaunchedEffect(Unit) {
+        if (repository.haySesionActiva()) {
+            onLoginExitoso()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -77,7 +95,10 @@ fun LoginVista() {
                     // Campo Correo
                     OutlinedTextField(
                         value = correo,
-                        onValueChange = { correo = it },
+                        onValueChange = {
+                            correo = it
+                            mostrarError = false
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = {
                             Text(
@@ -91,7 +112,8 @@ fun LoginVista() {
                             focusedContainerColor = Color(0xFFF5F5F5),
                             unfocusedContainerColor = Color(0xFFF5F5F5)
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        isError = mostrarError
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -99,7 +121,10 @@ fun LoginVista() {
                     // Campo Contraseña
                     OutlinedTextField(
                         value = contrasena,
-                        onValueChange = { contrasena = it },
+                        onValueChange = {
+                            contrasena = it
+                            mostrarError = false
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = {
                             Text(
@@ -114,27 +139,67 @@ fun LoginVista() {
                             focusedContainerColor = Color(0xFFF5F5F5),
                             unfocusedContainerColor = Color(0xFFF5F5F5)
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        isError = mostrarError
                     )
+
+                    if (mostrarError) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = mensajeError,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 14.sp
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Botón Ingresar
                     Button(
-                        onClick = { /* TODO */ },
+                        onClick = {
+                            mostrarError = false
+
+                            when {
+                                correo.isBlank() || contrasena.isBlank() -> {
+                                    mensajeError = "Complete todos los campos"
+                                    mostrarError = true
+                                }
+                                else -> {
+                                    cargando = true
+                                    val resultado = repository.iniciarSesion(correo, contrasena)
+
+                                    resultado.onSuccess {
+                                        onLoginExitoso()
+                                    }.onFailure { error ->
+                                        mensajeError = error.message ?: "Error al iniciar sesión"
+                                        mostrarError = true
+                                    }
+
+                                    cargando = false
+                                }
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = PrimaryPurple
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = !cargando
                     ) {
-                        Text(
-                            text = "Ingresar",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (cargando) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = Color.White
+                            )
+                        } else {
+                            Text(
+                                text = "Ingresar",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -142,7 +207,7 @@ fun LoginVista() {
             Spacer(modifier = Modifier.height(24.dp))
 
             // Link Registrarse
-            TextButton(onClick = { /* TODO */ }) {
+            TextButton(onClick = onIrRegistro) {
                 Text(
                     text = "Registrarse",
                     color = TextPrimary,
