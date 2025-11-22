@@ -15,6 +15,7 @@ import com.example.asistentefinanciero.ui.vistas.login.RegistrarseVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
 
 sealed class Pantalla {
     object Login : Pantalla()
@@ -23,6 +24,7 @@ sealed class Pantalla {
     object RegistrarIngreso : Pantalla()
     object RegistrarEgreso : Pantalla()
     object Historial : Pantalla()
+    object Calendario : Pantalla()
 }
 
 class MainActivity : ComponentActivity() {
@@ -78,7 +80,7 @@ fun AppNavigation() {
                     pantallaActual = Pantalla.RegistrarEgreso
                 },
                 onVerCalendario = {
-                    // TODO: Implementar calendario
+                    pantallaActual = Pantalla.Calendario
                 },
                 onVerEstadisticas = {
                     // TODO: Implementar estadísticas
@@ -115,6 +117,23 @@ fun AppNavigation() {
             HistorialVista(
                 onVolver = {
                     pantallaActual = Pantalla.Home
+                },
+                onCerrarSesion = {
+                    pantallaActual = Pantalla.Login
+                }
+            )
+        }
+
+        is Pantalla.Calendario -> {
+            CalendarioVista(
+                onVolver = {
+                    pantallaActual = Pantalla.Home
+                },
+                onVerHistorial = {
+                    pantallaActual = Pantalla.Historial
+                },
+                onCerrarSesion = {
+                    pantallaActual = Pantalla.Login
                 }
             )
         }
