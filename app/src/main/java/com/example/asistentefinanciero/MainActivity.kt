@@ -5,13 +5,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.asistentefinanciero.ui.theme.AsistenteFinancieroTheme
+import com.example.asistentefinanciero.ui.vistas.home.HomeVista
+import com.example.asistentefinanciero.ui.vistas.login.LoginVista
+import com.example.asistentefinanciero.ui.vistas.login.RegistrarseVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarEgresoVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
+
+sealed class Pantalla {
+    object Login : Pantalla()
+    object Registro : Pantalla()
+    object Home : Pantalla()
+    object RegistrarIngreso : Pantalla()
+    object RegistrarEgreso : Pantalla()
+    object Historial : Pantalla()
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,11 +31,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AsistenteFinancieroTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    AppNavigation()
                 }
             }
         }
@@ -31,17 +40,83 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation() {
+    var pantallaActual by remember { mutableStateOf<Pantalla>(Pantalla.Login) }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AsistenteFinancieroTheme {
-        Greeting("Android")
+    when (pantallaActual) {
+        is Pantalla.Login -> {
+            LoginVista(
+                onLoginExitoso = {
+                    pantallaActual = Pantalla.Home
+                },
+                onIrRegistro = {
+                    pantallaActual = Pantalla.Registro
+                }
+            )
+        }
+
+        is Pantalla.Registro -> {
+            RegistrarseVista(
+                onRegistroExitoso = {
+                    pantallaActual = Pantalla.Home
+                },
+                onVolverLogin = {
+                    pantallaActual = Pantalla.Login
+                }
+            )
+        }
+
+        is Pantalla.Home -> {
+            HomeVista(
+                onCerrarSesion = {
+                    pantallaActual = Pantalla.Login
+                },
+                onRegistrarIngreso = {
+                    pantallaActual = Pantalla.RegistrarIngreso
+                },
+                onRegistrarEgreso = {
+                    pantallaActual = Pantalla.RegistrarEgreso
+                },
+                onVerCalendario = {
+                    // TODO: Implementar calendario
+                },
+                onVerEstadisticas = {
+                    // TODO: Implementar estadísticas
+                },
+                onVerHistorial = {
+                    pantallaActual = Pantalla.Historial
+                }
+            )
+        }
+
+        is Pantalla.RegistrarIngreso -> {
+            RegistrarIngresoVista(
+                onVolver = {
+                    pantallaActual = Pantalla.Home
+                },
+                onVerHistorial = {
+                    pantallaActual = Pantalla.Historial
+                }
+            )
+        }
+
+        is Pantalla.RegistrarEgreso -> {
+            RegistrarEgresoVista(
+                onVolver = {
+                    pantallaActual = Pantalla.Home
+                },
+                onVerHistorial = {
+                    pantallaActual = Pantalla.Historial
+                }
+            )
+        }
+
+        is Pantalla.Historial -> {
+            HistorialVista(
+                onVolver = {
+                    pantallaActual = Pantalla.Home
+                }
+            )
+        }
     }
 }
