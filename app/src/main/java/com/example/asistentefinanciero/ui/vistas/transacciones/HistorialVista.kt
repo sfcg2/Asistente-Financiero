@@ -13,10 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.asistentefinanciero.data.repository.UsuarioRepository
 import com.example.asistentefinanciero.ui.theme.*
+import com.example.asistentefinanciero.ui.componentes.MenuPerfilDialog
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -33,9 +36,15 @@ data class Transaccion(
 @Composable
 fun HistorialVista(
     onVolver: () -> Unit = {},
-    onCerrarSesion: () -> Unit
+    onCerrarSesion: () -> Unit = {},
+    onVerCalendario: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val repository = remember { UsuarioRepository(context) }
+    val usuario = remember { repository.obtenerUsuarioActual() }
+
     var tipoSeleccionado by remember { mutableStateOf(TipoHistorial.TODOS) }
+    var mostrarMenuPerfil by remember { mutableStateOf(false) }
 
     // Datos de ejemplo
     val transaccionesTodas = listOf(
@@ -93,7 +102,7 @@ fun HistorialVista(
                 )
 
                 IconButton(
-                    onClick = { /* TODO: Configuración */ },
+                    onClick = { mostrarMenuPerfil = true },
                     modifier = Modifier
                         .size(40.dp)
                         .background(PrimaryPurple, CircleShape)
@@ -254,7 +263,7 @@ fun HistorialVista(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = onVerCalendario) {
                         Icon(
                             imageVector = Icons.Default.CalendarToday,
                             contentDescription = "Calendario",
@@ -316,6 +325,35 @@ fun HistorialVista(
                     )
                 }
             }
+        }
+
+        // Menú de perfil
+        if (mostrarMenuPerfil) {
+            MenuPerfilDialog(
+                nombreUsuario = usuario?.nombre ?: "Usuario",
+                onDismiss = { mostrarMenuPerfil = false },
+                onDatosPersonales = {
+                    mostrarMenuPerfil = false
+                    // TODO: Navegar a datos personales
+                },
+                onNotificaciones = {
+                    mostrarMenuPerfil = false
+                    // TODO: Navegar a notificaciones
+                },
+                onSeguridad = {
+                    mostrarMenuPerfil = false
+                    // TODO: Navegar a seguridad
+                },
+                onTerminos = {
+                    mostrarMenuPerfil = false
+                    // TODO: Navegar a términos
+                },
+                onCerrarSesion = {
+                    mostrarMenuPerfil = false
+                    repository.cerrarSesion()
+                    onCerrarSesion()
+                }
+            )
         }
     }
 }

@@ -16,6 +16,10 @@ import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoV
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
+import com.example.asistentefinanciero.ui.vistas.perfil.PerfilVista
+import com.example.asistentefinanciero.ui.vistas.perfil.SeguridadVista
+import com.example.asistentefinanciero.ui.vistas.perfil.NotificacionesVista
+import com.example.asistentefinanciero.ui.vistas.perfil.TerminosVista
 
 sealed class Pantalla {
     object Login : Pantalla()
@@ -25,6 +29,10 @@ sealed class Pantalla {
     object RegistrarEgreso : Pantalla()
     object Historial : Pantalla()
     object Calendario : Pantalla()
+    object Perfil : Pantalla()
+    object Seguridad : Pantalla()
+    object Notificaciones : Pantalla()
+    object Terminos : Pantalla()
 }
 
 class MainActivity : ComponentActivity() {
@@ -44,6 +52,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     var pantallaActual by remember { mutableStateOf<Pantalla>(Pantalla.Login) }
+    var pantallaAnterior by remember { mutableStateOf<Pantalla?>(null) }
 
     when (pantallaActual) {
         is Pantalla.Login -> {
@@ -120,6 +129,9 @@ fun AppNavigation() {
                 },
                 onCerrarSesion = {
                     pantallaActual = Pantalla.Login
+                },
+                onVerCalendario = {
+                    pantallaActual = Pantalla.Calendario
                 }
             )
         }
@@ -134,6 +146,38 @@ fun AppNavigation() {
                 },
                 onCerrarSesion = {
                     pantallaActual = Pantalla.Login
+                }
+            )
+        }
+
+        is Pantalla.Perfil -> {
+            PerfilVista(
+                onVolver = {
+                    pantallaActual = pantallaAnterior ?: Pantalla.Home
+                }
+            )
+        }
+
+        is Pantalla.Seguridad -> {
+            SeguridadVista(
+                onVolver = {
+                    pantallaActual = pantallaAnterior ?: Pantalla.Home
+                }
+            )
+        }
+
+        is Pantalla.Notificaciones -> {
+            NotificacionesVista(
+                onVolver = {
+                    pantallaActual = pantallaAnterior ?: Pantalla.Home
+                }
+            )
+        }
+
+        is Pantalla.Terminos -> {
+            TerminosVista(
+                onVolver = {
+                    pantallaActual = pantallaAnterior ?: Pantalla.Home
                 }
             )
         }
