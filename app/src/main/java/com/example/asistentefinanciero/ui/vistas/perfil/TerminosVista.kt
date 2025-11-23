@@ -197,6 +197,7 @@ fun TerminosVista(
 
             Spacer(modifier = Modifier.height(100.dp))
         }
+
     }
 }
 

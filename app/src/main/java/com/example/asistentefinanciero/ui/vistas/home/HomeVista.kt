@@ -437,6 +437,7 @@ fun HomeVista(
             }
         }
 
+
         // Menú de perfil
         if (mostrarMenuPerfil) {
             MenuPerfilDialog(

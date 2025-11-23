@@ -363,6 +363,7 @@ fun TransaccionItem(
     transaccion: Transaccion,
     formatoMoneda: NumberFormat
 ) {
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = CardDark),

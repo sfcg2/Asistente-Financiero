@@ -178,6 +178,7 @@ fun NotificationOption(
             )
         }
 
+
         Switch(
             checked = activado,
             onCheckedChange = onCambio,

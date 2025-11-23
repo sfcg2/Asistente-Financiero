@@ -198,6 +198,7 @@ fun SeguridadVista(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
+
                     text = "Guardar cambios",
                     color = Color.White,
                     fontSize = 16.sp,

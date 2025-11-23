@@ -170,6 +170,7 @@ fun MenuOption(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Icon(
                     imageVector = icon,
                     contentDescription = text,

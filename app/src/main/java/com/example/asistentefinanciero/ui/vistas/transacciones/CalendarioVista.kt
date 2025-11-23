@@ -274,6 +274,7 @@ fun MesCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
                     Column {
                         Text(
                             text = "Salario mensual",
