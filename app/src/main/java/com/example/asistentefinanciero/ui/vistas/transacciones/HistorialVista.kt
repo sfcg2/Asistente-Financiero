@@ -37,7 +37,11 @@ data class Transaccion(
 fun HistorialVista(
     onVolver: () -> Unit = {},
     onCerrarSesion: () -> Unit = {},
-    onVerCalendario: () -> Unit = {}
+    onVerCalendario: () -> Unit = {},
+    onIrPerfil: () -> Unit = {},
+    onIrSeguridad: () -> Unit = {},
+    onIrNotificaciones: () -> Unit = {},
+    onIrTerminos: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val repository = remember { UsuarioRepository(context) }
@@ -334,19 +338,19 @@ fun HistorialVista(
                 onDismiss = { mostrarMenuPerfil = false },
                 onDatosPersonales = {
                     mostrarMenuPerfil = false
-                    // TODO: Navegar a datos personales
+                    onIrPerfil()
                 },
                 onNotificaciones = {
                     mostrarMenuPerfil = false
-                    // TODO: Navegar a notificaciones
+                    onIrNotificaciones()
                 },
                 onSeguridad = {
                     mostrarMenuPerfil = false
-                    // TODO: Navegar a seguridad
+                    onIrSeguridad()
                 },
                 onTerminos = {
                     mostrarMenuPerfil = false
-                    // TODO: Navegar a términos
+                    onIrTerminos()
                 },
                 onCerrarSesion = {
                     mostrarMenuPerfil = false
@@ -363,7 +367,6 @@ fun TransaccionItem(
     transaccion: Transaccion,
     formatoMoneda: NumberFormat
 ) {
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = CardDark),

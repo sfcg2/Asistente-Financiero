@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.asistentefinanciero.ui.theme.*
 
+
 /**
  * Diálogo del menú de perfil de usuario
  * Componente reutilizable para todas las pantallas de la aplicación

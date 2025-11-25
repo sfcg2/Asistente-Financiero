@@ -97,6 +97,22 @@ fun AppNavigation() {
                 },
                 onVerHistorial = {
                     pantallaActual = Pantalla.Historial
+                },
+                onIrPerfil = {
+                    pantallaAnterior = Pantalla.Home
+                    pantallaActual = Pantalla.Perfil
+                },
+                onIrSeguridad = {
+                    pantallaAnterior = Pantalla.Home
+                    pantallaActual = Pantalla.Seguridad
+                },
+                onIrNotificaciones = {
+                    pantallaAnterior = Pantalla.Home
+                    pantallaActual = Pantalla.Notificaciones
+                },
+                onIrTerminos = {
+                    pantallaAnterior = Pantalla.Home
+                    pantallaActual = Pantalla.Terminos
                 }
             )
         }

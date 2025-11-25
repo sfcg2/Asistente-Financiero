@@ -26,8 +26,12 @@ import com.example.asistentefinanciero.ui.componentes.MenuPerfilDialog
 fun CalendarioVista(
     onVolver: () -> Unit = {},
     onVerHistorial: () -> Unit = {},
-    onCerrarSesion: () -> Unit = {}
-) {
+    onCerrarSesion: () -> Unit = {},
+    onIrPerfil: () -> Unit = {},
+    onIrSeguridad: () -> Unit = {},
+    onIrNotificaciones: () -> Unit = {},
+    onIrTerminos: () -> Unit = {}
+)  {
     val context = LocalContext.current
     val repository = remember { UsuarioRepository(context) }
     val usuario = remember { repository.obtenerUsuarioActual() }
@@ -193,20 +197,24 @@ fun CalendarioVista(
                 onDismiss = { mostrarMenuPerfil = false },
                 onDatosPersonales = {
                     mostrarMenuPerfil = false
+                    onIrPerfil()
                 },
                 onNotificaciones = {
                     mostrarMenuPerfil = false
+                    onIrNotificaciones()
                 },
                 onSeguridad = {
                     mostrarMenuPerfil = false
+                    onIrSeguridad()
                 },
                 onTerminos = {
                     mostrarMenuPerfil = false
+                    onIrTerminos()
                 },
                 onCerrarSesion = {
                     mostrarMenuPerfil = false
                     repository.cerrarSesion()
-                    onVolver()
+                    onCerrarSesion()
                 }
             )
         }
