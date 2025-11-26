@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "22419025540",
+    "project_id": "asistente-financiero-fec2e",
+    "storage_bucket": "asistente-financiero-fec2e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:22419025540:android:ffd63fe56e56a24bed5cd1",
+        "android_client_info": {
+          "package_name": "com.example.asistentefinanciero"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0Pf-IIYVjT4vCsZbfT8u2kp6QnuufoRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
