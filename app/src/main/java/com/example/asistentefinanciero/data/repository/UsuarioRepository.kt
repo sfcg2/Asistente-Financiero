@@ -40,4 +40,16 @@ class UsuarioRepository {
             println("Error al incrementar saldo: ${e.message}")
         }
     }
+
+    suspend fun decrementarSaldo(usuarioId: String, cantidad: Double) {
+        try {
+            val usuario = obtenerUsuario(usuarioId)
+            if (usuario != null) {
+                val nuevoSaldo = usuario.saldo - cantidad
+                actualizarSaldo(usuarioId, nuevoSaldo)
+            }
+        } catch (e: Exception) {
+            println("Error al decrementar saldo: ${e.message}")
+        }
+    }
 }

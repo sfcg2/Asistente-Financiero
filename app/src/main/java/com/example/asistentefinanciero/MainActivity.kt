@@ -10,7 +10,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.asistentefinanciero.ui.theme.AsistenteFinancieroTheme
+import com.example.asistentefinanciero.ui.vistas.egreso.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
+import com.example.asistentefinanciero.viewmodel.EgresoViewModel
 import com.example.asistentefinanciero.viewmodel.IngresoViewModel
 
 class MainActivity : ComponentActivity() {
@@ -20,8 +22,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             AsistenteFinancieroTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val viewModel: IngresoViewModel = viewModel()
-                    RegistrarIngresoVista(
+                    val viewModel: EgresoViewModel = viewModel()
+                    RegistrarEgresoVista(
                         viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
