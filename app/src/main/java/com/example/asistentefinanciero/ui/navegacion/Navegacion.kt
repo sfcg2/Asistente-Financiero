@@ -10,7 +10,6 @@ import com.example.asistentefinanciero.ui.vistas.egreso.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
 import com.example.asistentefinanciero.ui.vistas.home.HomeVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
-// ✨ IMPORTAR la nueva CalendarioVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
 import com.example.asistentefinanciero.viewmodel.EgresoViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
@@ -25,7 +24,6 @@ enum class Pantalla {
     ESTADISTICAS
 }
 
-// ✨ NUEVO: Clase para manejar el estado con argumentos (filtro de mes)
 data class NavState(
     val pantalla: Pantalla,
     val mesFiltro: Int? = null // Argumento para filtrar el historial por mes (1-12)
@@ -35,7 +33,6 @@ data class NavState(
 fun AppNavigation(
     usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH"
 ) {
-    // ✨ Usamos NavState para manejar la pantalla y sus argumentos
     var navState by remember { mutableStateOf(NavState(Pantalla.HOME)) }
     val historialViewModel: HistorialViewModel = viewModel() // Creamos el ViewModel una sola vez aquí
 
@@ -88,7 +85,6 @@ fun AppNavigation(
             )
         }
 
-        // ✨ IMPLEMENTACIÓN DE CALENDARIO
         Pantalla.CALENDARIO -> {
             CalendarioVista(
                 onVolver = { navState = NavState(Pantalla.HOME) },

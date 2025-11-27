@@ -21,12 +21,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.HomeViewModel
+import com.example.asistentefinanciero.viewmodel.HistorialViewModel
+import com.example.asistentefinanciero.viewmodel.TransaccionItem
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
 fun HomeVista(
     homeViewModel: HomeViewModel = viewModel(),
+    historialViewModel: HistorialViewModel = viewModel(),
     modifier: Modifier = Modifier,
     onCerrarSesion: () -> Unit = {},
     onRegistrarIngreso: () -> Unit = {},
@@ -40,16 +43,24 @@ fun HomeVista(
     nombreUsuario: String = "Carlos Sánchez",
     onIrTerminos: () -> Unit = {}
 ) {
+    val usuarioId = "K6Tr9DTjDIMGf7PFG4MH"
+
     var mesSeleccionado by remember { mutableStateOf("Mes") }
     var mostrarMenuMes by remember { mutableStateOf(false) }
     var mostrarMenuPerfil by remember { mutableStateOf(false) }
 
     val saldo by homeViewModel.saldoActual.collectAsState()
-    val ingresos by homeViewModel.ingresosMes.collectAsState()
-    val egresos by homeViewModel.egresosMes.collectAsState()
+
+    // OBTENER TRANSACCIONES Y FILTRAR A LAS ÚLTIMAS DOS
+    val todasLasTransacciones by historialViewModel.transacciones.collectAsState()
+    val ultimasDosTransacciones = remember(todasLasTransacciones) {
+        todasLasTransacciones.take(2)
+    }
+    val isLoadingTransacciones by historialViewModel.isLoading.collectAsState()
 
     LaunchedEffect(Unit) {
-        homeViewModel.cargarDatos("K6Tr9DTjDIMGf7PFG4MH")
+        homeViewModel.cargarDatos(usuarioId)
+        historialViewModel.cargarTransacciones(usuarioId, mes = null)
     }
 
     val formatoMoneda = remember {
@@ -98,7 +109,7 @@ fun HomeVista(
                     ) {
                         // Botón de usuario con menú
                         IconButton(
-                            onClick = { mostrarMenuPerfil = true }, // ESTA ES LA MODIFICACIÓN CLAVE
+                            onClick = { mostrarMenuPerfil = true },
                             modifier = Modifier
                                 .size(48.dp)
                                 .background(PrimaryPurple, CircleShape)
@@ -110,6 +121,7 @@ fun HomeVista(
                             )
                         }
 
+                        // Menú desplegable para el mes
                         Box {
                             TextButton(
                                 onClick = { mostrarMenuMes = !mostrarMenuMes }
@@ -163,92 +175,45 @@ fun HomeVista(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Botones Ingresos y Egresos con fondo
+                    // --- BOTONES INGRESOS Y EGRESOS ---
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         // Botón Ingresos
                         Card(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(50.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = CardDark
-                            ),
+                            modifier = Modifier.weight(1f).height(50.dp),
+                            colors = CardDefaults.cardColors(containerColor = CardDark),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Button(
-                                onClick = onRegistrarIngreso,
-                                modifier = Modifier.fillMaxSize(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Transparent
-                                ),
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.TrendingUp,
-                                        contentDescription = "Ingresos",
-                                        tint = Color(0xFF00E676),
-                                        modifier = Modifier.size(20.dp)
-                                    )
+                            Button(onClick = onRegistrarIngreso, modifier = Modifier.fillMaxSize(), colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), contentPadding = PaddingValues(0.dp)) {
+                                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                                    Icon(imageVector = Icons.Default.TrendingUp, contentDescription = "Ingresos", tint = Color(0xFF00E676), modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Ingresos",
-                                        color = TextPrimary,
-                                        fontSize = 14.sp
-                                    )
+                                    Text(text = "Ingresos", color = TextPrimary, fontSize = 14.sp)
                                 }
                             }
                         }
 
                         // Botón Egresos
                         Card(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(50.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = CardDark
-                            ),
+                            modifier = Modifier.weight(1f).height(50.dp),
+                            colors = CardDefaults.cardColors(containerColor = CardDark),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Button(
-                                onClick = onRegistrarEgreso,
-                                modifier = Modifier.fillMaxSize(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Transparent
-                                ),
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.TrendingDown,
-                                        contentDescription = "Egresos",
-                                        tint = Color(0xFFFF1744),
-                                        modifier = Modifier.size(20.dp)
-                                    )
+                            Button(onClick = onRegistrarEgreso, modifier = Modifier.fillMaxSize(), colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), contentPadding = PaddingValues(0.dp)) {
+                                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                                    Icon(imageVector = Icons.Default.TrendingDown, contentDescription = "Egresos", tint = Color(0xFFFF1744), modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Egresos",
-                                        color = TextPrimary,
-                                        fontSize = 14.sp
-                                    )
+                                    Text(text = "Egresos", color = TextPrimary, fontSize = 14.sp)
                                 }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
 
+                    // --- SALDO ACTUAL ---
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -266,98 +231,62 @@ fun HomeVista(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(60.dp)) // Separación grande después del saldo
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = CardDark),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Ingresos del mes",
-                                    color = TextSecondary,
-                                    fontSize = 12.sp
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "\$ ${formatoMoneda.format(ingresos)}",
-                                    color = TextPrimary,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
+                    // --- INICIO: ÚLTIMAS DOS TRANSACCIONES ---
+                    Text(
+                        text = "Últimas Transacciones",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextPrimary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp)) // Separación después del título
+
+                    if (isLoadingTransacciones) {
+                        Box(modifier = Modifier.fillMaxWidth().height(140.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = PrimaryPurple)
+                        }
+                    } else if (ultimasDosTransacciones.isEmpty()) {
+                        Text(
+                            text = "No hay transacciones recientes registradas.",
+                            color = TextSecondary,
+                            fontSize = 14.sp,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            ultimasDosTransacciones.forEach { transaccion ->
+                                // USANDO LA FUNCIÓN LOCAL
+                                TransaccionCard(
+                                    transaccion = transaccion,
+                                    formatoMoneda = formatoMoneda
                                 )
                             }
-
-                            Icon(
-                                imageVector = Icons.Default.TrendingUp,
-                                contentDescription = null,
-                                tint = Color(0xFF00E676),
-                                modifier = Modifier.size(24.dp)
-                            )
                         }
                     }
+                    // --- FIN: ÚLTIMAS DOS TRANSACCIONES ---
 
-                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = CardDark),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Egresos del mes",
-                                    color = TextSecondary,
-                                    fontSize = 12.sp
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "\$ ${formatoMoneda.format(egresos)}",
-                                    color = TextPrimary,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                    Spacer(modifier = Modifier.height(12.dp)) // Separación antes del botón Historial
 
-                            Icon(
-                                imageVector = Icons.Default.TrendingDown,
-                                contentDescription = null,
-                                tint = Color(0xFFFF1744),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
+                    // --- BOTÓN VER HISTORIAL ---
                     TextButton(
                         onClick = onVerHistorial,
                         modifier = Modifier.align(Alignment.End)
                     ) {
                         Text(
-                            text = "Ver historial",
-                            color = TextSecondary,
-                            fontSize = 12.sp
+                            text = "Ver historial completo",
+                            color = PrimaryPurple,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
                             contentDescription = null,
-                            tint = TextSecondary,
+                            tint = PrimaryPurple,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -367,7 +296,7 @@ fun HomeVista(
             Spacer(modifier = Modifier.height(100.dp))
         }
 
-        // Barra de navegación inferior
+        // --- BARRA DE NAVEGACIÓN INFERIOR (Sin modificar) ---
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -384,74 +313,31 @@ fun HomeVista(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    IconButton(onClick = onVerCalendario) {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendario",
-                            tint = TextSecondary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Text(
-                        text = "Calendario",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                // Botón Calendario
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onVerCalendario) { Icon(imageVector = Icons.Default.DateRange, contentDescription = "Calendario", tint = TextSecondary, modifier = Modifier.size(24.dp)) }
+                    Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
                 }
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                            .background(PrimaryPurple),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Inicio",
-                            tint = Color.White,
-                            modifier = Modifier.size(28.dp)
-                        )
+                // Botón Inicio (Activo)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.size(56.dp).clip(CircleShape).background(PrimaryPurple), contentAlignment = Alignment.Center) {
+                        Icon(imageVector = Icons.Default.Home, contentDescription = "Inicio", tint = Color.White, modifier = Modifier.size(28.dp))
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Inicio",
-                        color = TextPrimary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(text = "Inicio", color = TextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    IconButton(onClick = onVerHistorial) {
-                        Icon(
-                            imageVector = Icons.Default.List,
-                            contentDescription = "Historial",
-                            tint = TextSecondary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Text(
-                        text = "Historial",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                // Botón Historial
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onVerHistorial) { Icon(imageVector = Icons.Default.List, contentDescription = "Historial", tint = TextSecondary, modifier = Modifier.size(24.dp)) }
+                    Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }
 
-        // Menú de perfil (simplificado por ahora)
+
+        // Menú de perfil (Diálogo)
         if (mostrarMenuPerfil) {
             MenuPerfilDialog(
                 nombreUsuario = nombreUsuario,
@@ -476,6 +362,64 @@ fun HomeVista(
                     mostrarMenuPerfil = false
                     onCerrarSesion()
                 }
+            )
+        }
+    }
+}
+
+// --- FUNCIÓN TRANSACCIONCARD DUPLICADA LOCALMENTE (MODIFICADA PARA SER MÁS COMPACTA) ---
+@Composable
+fun TransaccionCard(
+    transaccion: TransaccionItem,
+    formatoMoneda: NumberFormat
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = transaccion.nombre,
+                    color = TextPrimary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                Text(
+                    text = "$${formatoMoneda.format(transaccion.monto)}",
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                Text(
+                    text = "${transaccion.fecha} • ${transaccion.hora}",
+                    color = TextSecondary,
+                    fontSize = 12.sp
+                )
+            }
+
+            Icon(
+                imageVector = if (transaccion.esIngreso)
+                    Icons.Default.TrendingUp
+                else
+                    Icons.Default.TrendingDown,
+                contentDescription = if (transaccion.esIngreso) "Ingreso" else "Egreso",
+                tint = if (transaccion.esIngreso)
+                    Color(0xFF00E676)
+                else
+                    Color(0xFFFF1744),
+                modifier = Modifier.size(28.dp)
             )
         }
     }

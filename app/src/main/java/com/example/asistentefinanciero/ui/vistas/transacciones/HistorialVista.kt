@@ -46,8 +46,6 @@ fun HistorialVista(
         }
     }
 
-    // ✨ Cargar transacciones al iniciar, usando el filtro de mes recibido.
-    // El efecto se ejecuta una vez al inicio, y cada vez que cambia mesFiltroInicial.
     LaunchedEffect(mesFiltroInicial) {
         viewModel.cargarTransacciones(usuarioId, mes = mesFiltroInicial)
     }

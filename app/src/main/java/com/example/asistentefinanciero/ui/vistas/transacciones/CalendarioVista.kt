@@ -1,6 +1,3 @@
-// com.example.asistentefinanciero.ui.vistas.transacciones
-// En el archivo CalendarioVista.kt
-
 package com.example.asistentefinanciero.ui.vistas.transacciones
 
 import androidx.compose.foundation.background
@@ -52,7 +49,6 @@ fun CalendarioVista(
     modifier: Modifier = Modifier,
     onMesSeleccionado: (Int) -> Unit = {},
     onVolver: () -> Unit = {},
-    // ✨ NUEVOS CALLBACKS para la barra de navegación
     onVerInicio: () -> Unit = {},
     onVerHistorial: () -> Unit = {}
 ) {
@@ -115,8 +111,6 @@ fun CalendarioVista(
                 }
             }
         }
-
-        // ✨ BARRA DE NAVEGACIÓN INFERIOR (Copiada de HistorialVista)
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
