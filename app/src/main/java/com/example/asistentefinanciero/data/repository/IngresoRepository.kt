@@ -27,7 +27,7 @@ class IngresoRepository {
         baseDeDatos.collection("usuarios")
             .document(usuarioId)
             .collection("ingresos")
-            .orderBy("fechaCreacion", Query.Direction.DESCENDING)
+            .orderBy("fecha", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     onResult(emptyList())
