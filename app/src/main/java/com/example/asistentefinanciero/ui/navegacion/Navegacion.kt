@@ -1,7 +1,6 @@
 package com.example.asistentefinanciero.ui.navegacion
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,6 +10,8 @@ import com.example.asistentefinanciero.ui.vistas.egreso.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
 import com.example.asistentefinanciero.ui.vistas.home.HomeVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
+// ✨ IMPORTAR la nueva CalendarioVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
 import com.example.asistentefinanciero.viewmodel.EgresoViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.IngresoViewModel
@@ -24,20 +25,29 @@ enum class Pantalla {
     ESTADISTICAS
 }
 
+// ✨ NUEVO: Clase para manejar el estado con argumentos (filtro de mes)
+data class NavState(
+    val pantalla: Pantalla,
+    val mesFiltro: Int? = null // Argumento para filtrar el historial por mes (1-12)
+)
+
 @Composable
 fun AppNavigation(
     usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH"
 ) {
-    var pantallaActual by remember { mutableStateOf(Pantalla.HOME) }
+    // ✨ Usamos NavState para manejar la pantalla y sus argumentos
+    var navState by remember { mutableStateOf(NavState(Pantalla.HOME)) }
+    val historialViewModel: HistorialViewModel = viewModel() // Creamos el ViewModel una sola vez aquí
 
-    when (pantallaActual) {
+    when (navState.pantalla) {
         Pantalla.HOME -> {
             HomeVista(
-                onRegistrarIngreso = { pantallaActual = Pantalla.REGISTRAR_INGRESO },
-                onRegistrarEgreso = { pantallaActual = Pantalla.REGISTRAR_EGRESO },
-                onVerCalendario = { pantallaActual = Pantalla.CALENDARIO },
-                onVerEstadisticas = { pantallaActual = Pantalla.ESTADISTICAS },
-                onVerHistorial = { pantallaActual = Pantalla.HISTORIAL },
+                onRegistrarIngreso = { navState = NavState(Pantalla.REGISTRAR_INGRESO) },
+                onRegistrarEgreso = { navState = NavState(Pantalla.REGISTRAR_EGRESO) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerEstadisticas = { navState = NavState(Pantalla.ESTADISTICAS) },
+                // Cuando vamos al historial desde el Home, el filtro de mes es NULL (todos)
+                onVerHistorial = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = null) },
                 onCerrarSesion = { /* Implementar logout */ },
                 onIrPerfil = { /* Implementar perfil */ },
                 onIrSeguridad = { /* Implementar seguridad */ },
@@ -51,8 +61,8 @@ fun AppNavigation(
             RegistrarIngresoVista(
                 viewModel = viewModel,
                 usuarioId = usuarioId,
-                onVolver = { pantallaActual = Pantalla.HOME },
-                onVerHistorial = { pantallaActual = Pantalla.HISTORIAL }
+                onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
             )
         }
 
@@ -61,34 +71,36 @@ fun AppNavigation(
             RegistrarEgresoVista(
                 viewModel = viewModel,
                 usuarioId = usuarioId,
-                onVolver = { pantallaActual = Pantalla.HOME },
-                onVerHistorial = { pantallaActual = Pantalla.HISTORIAL }
+                onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
             )
         }
 
         Pantalla.HISTORIAL -> {
-            val viewModel: HistorialViewModel = viewModel()
             HistorialVista(
-                viewModel = viewModel,
+                viewModel = historialViewModel,
                 usuarioId = usuarioId,
-                onVolver = { pantallaActual = Pantalla.HOME },
-                onVerCalendario = { pantallaActual = Pantalla.CALENDARIO },
-                onVerInicio = { pantallaActual = Pantalla.HOME }
+                // Le pasamos el filtro de mes actual al Composable
+                mesFiltroInicial = navState.mesFiltro,
+                onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerInicio = { navState = NavState(Pantalla.HOME) }
             )
         }
 
+        // ✨ IMPLEMENTACIÓN DE CALENDARIO
         Pantalla.CALENDARIO -> {
-            // TODO: Implementar vista de calendario
-            LaunchedEffect(Unit) {
-                pantallaActual = Pantalla.HOME
-            }
+            CalendarioVista(
+                onVolver = { navState = NavState(Pantalla.HOME) },
+                onMesSeleccionado = { mes ->
+                    navState = NavState(Pantalla.HISTORIAL, mesFiltro = mes)},
+                    onVerInicio = { navState = NavState(Pantalla.HOME) },
+                    onVerHistorial = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = null) }
+            )
         }
 
         Pantalla.ESTADISTICAS -> {
             // TODO: Implementar vista de estadísticas
-            LaunchedEffect(Unit) {
-                pantallaActual = Pantalla.HOME
-            }
         }
     }
 }

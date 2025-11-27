@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.asistentefinanciero.ui.theme.*
+import com.example.asistentefinanciero.ui.theme.* // Asegúrate de que tus imports de tema son correctos
 import com.example.asistentefinanciero.viewmodel.FiltroHistorial
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
@@ -28,6 +28,8 @@ import java.util.Locale
 fun HistorialVista(
     viewModel: HistorialViewModel,
     usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
+    // ✨ MODIFICACIÓN CLAVE: Parámetro para recibir el filtro de mes.
+    mesFiltroInicial: Int? = null,
     modifier: Modifier = Modifier,
     onVolver: () -> Unit = {},
     onVerCalendario: () -> Unit = {},
@@ -44,9 +46,10 @@ fun HistorialVista(
         }
     }
 
-    // Cargar transacciones al iniciar
-    LaunchedEffect(Unit) {
-        viewModel.cargarTransacciones(usuarioId)
+    // ✨ Cargar transacciones al iniciar, usando el filtro de mes recibido.
+    // El efecto se ejecuta una vez al inicio, y cada vez que cambia mesFiltroInicial.
+    LaunchedEffect(mesFiltroInicial) {
+        viewModel.cargarTransacciones(usuarioId, mes = mesFiltroInicial)
     }
 
     Box(
@@ -90,7 +93,7 @@ fun HistorialVista(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Filtros
+            // Filtros (Todos, Ingresos, Egresos)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -189,6 +192,7 @@ fun HistorialVista(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Botón Calendario
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -208,6 +212,7 @@ fun HistorialVista(
                     )
                 }
 
+                // Botón Inicio
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -227,6 +232,7 @@ fun HistorialVista(
                     )
                 }
 
+                // Botón Historial (Actual)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -257,6 +263,8 @@ fun HistorialVista(
         }
     }
 }
+
+// --- Componibles Reutilizados (FiltroButton y TransaccionCard) ---
 
 @Composable
 fun FiltroButton(

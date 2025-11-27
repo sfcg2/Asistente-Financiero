@@ -1,6 +1,6 @@
 package com.example.asistentefinanciero.ui.vistas.home
 
-
+import com.example.asistentefinanciero.ui.componentes.MenuPerfilDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -37,6 +37,7 @@ fun HomeVista(
     onIrPerfil: () -> Unit = {},
     onIrSeguridad: () -> Unit = {},
     onIrNotificaciones: () -> Unit = {},
+    nombreUsuario: String = "Carlos Sánchez",
     onIrTerminos: () -> Unit = {}
 ) {
     var mesSeleccionado by remember { mutableStateOf("Mes") }
@@ -97,7 +98,7 @@ fun HomeVista(
                     ) {
                         // Botón de usuario con menú
                         IconButton(
-                            onClick = { mostrarMenuPerfil = true },
+                            onClick = { mostrarMenuPerfil = true }, // ESTA ES LA MODIFICACIÓN CLAVE
                             modifier = Modifier
                                 .size(48.dp)
                                 .background(PrimaryPurple, CircleShape)
@@ -452,43 +453,29 @@ fun HomeVista(
 
         // Menú de perfil (simplificado por ahora)
         if (mostrarMenuPerfil) {
-            AlertDialog(
-                onDismissRequest = { mostrarMenuPerfil = false },
-                title = { Text("Menú de Usuario", color = TextPrimary) },
-                text = {
-                    Column {
-                        TextButton(onClick = {
-                            mostrarMenuPerfil = false
-                            onIrPerfil()
-                        }) {
-                            Text("Datos Personales", color = TextPrimary)
-                        }
-                        TextButton(onClick = {
-                            mostrarMenuPerfil = false
-                            onIrNotificaciones()
-                        }) {
-                            Text("Notificaciones", color = TextPrimary)
-                        }
-                        TextButton(onClick = {
-                            mostrarMenuPerfil = false
-                            onIrSeguridad()
-                        }) {
-                            Text("Seguridad", color = TextPrimary)
-                        }
-                        TextButton(onClick = {
-                            mostrarMenuPerfil = false
-                            onCerrarSesion()
-                        }) {
-                            Text("Cerrar Sesión", color = Color(0xFFFF5252))
-                        }
-                    }
+            MenuPerfilDialog(
+                nombreUsuario = nombreUsuario,
+                onDismiss = { mostrarMenuPerfil = false },
+                onDatosPersonales = {
+                    mostrarMenuPerfil = false
+                    onIrPerfil()
                 },
-                confirmButton = {
-                    TextButton(onClick = { mostrarMenuPerfil = false }) {
-                        Text("Cerrar", color = PrimaryPurple)
-                    }
+                onNotificaciones = {
+                    mostrarMenuPerfil = false
+                    onIrNotificaciones()
                 },
-                containerColor = SurfaceDark
+                onSeguridad = {
+                    mostrarMenuPerfil = false
+                    onIrSeguridad()
+                },
+                onTerminos = {
+                    mostrarMenuPerfil = false
+                    onIrTerminos()
+                },
+                onCerrarSesion = {
+                    mostrarMenuPerfil = false
+                    onCerrarSesion()
+                }
             )
         }
     }
