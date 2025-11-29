@@ -55,6 +55,9 @@ class EstadisticasViewModel : ViewModel() {
     private var todosLosEgresos = listOf<Egreso>()
 
     //Carga los ingresos del usuario y opcionalmente filtra por mes
+
+
+
     fun cargarDatos(usuarioId: String, mes: Int? = null) {
         _mesFiltro.value = mes
         _isLoading.value = true
@@ -188,16 +191,32 @@ class EstadisticasViewModel : ViewModel() {
             null
         }
     }
-    private fun obtenerColorPorCategoria(categoria: String): Color {
-        return when (categoria.lowercase()) {
-            "salario"     -> Color(0xFF1E88E5) // Azul brillante
-            "freelance"   -> Color(0xFF4CAF50) // Verde medio (similar al original)
-            "inversiones" -> Color(0xFFFFB300) // Ámbar oscuro
-            "ventas"      -> Color(0xFFF4511E) // Naranja rojizo (dark orange)
-            "bonos"       -> Color(0xFF8E24AA) // Morado oscuro/índigo
-            "regalos"     -> Color(0xFFD81B60) // Rosa fuerte (fuchsia)
-            "otro"        -> Color(0xFF546E7A) // Gris azulado (slate gray)
-            else          -> Color(0xFF00ACC1) // Azul cian (cielish blue)
+    private fun obtenerColorPorCategoria(categoria: String, esGasto: Boolean): Color {
+        val catLower = categoria.lowercase().trim()
+
+        return if (esGasto) {
+            when (catLower) {
+                "alimentación", "comida", "restaurante" -> Color(0xFFEF5350)
+                "transporte", "gasolina", "taxi" -> Color(0xFF42A5F5)
+                "vivienda", "alquiler", "casa" -> Color(0xFF8D6E63)
+                "servicios", "luz", "agua", "internet" -> Color(0xFFFFCA28)
+                "salud", "medicina", "farmacia" -> Color(0xFF66BB6A)
+                "ocio", "cine", "entretenimiento" -> Color(0xFFAB47BC)
+                "educación", "universidad", "libros" -> Color(0xFF5C6BC0)
+                "ropa", "vestimenta" -> Color(0xFF26A69A)
+                "mascotas" -> Color(0xFFFFA726)
+                else -> Color(0xFF78909C)
+            }
+        } else {
+            when (catLower) {
+                "salario", "sueldo", "nomina" -> Color(0xFF1E88E5)
+                "freelance", "trabajos extra" -> Color(0xFF4CAF50)
+                "inversiones", "dividendos" -> Color(0xFFFFB300)
+                "ventas" -> Color(0xFFF4511E)
+                "bonos", "premios" -> Color(0xFF8E24AA)
+                "regalos" -> Color(0xFFD81B60)
+                else -> Color(0xFF546E7A)
+            }
         }
     }
 }
