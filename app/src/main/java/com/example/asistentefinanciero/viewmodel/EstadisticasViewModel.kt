@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.asistentefinanciero.data.model.Egreso
 import com.example.asistentefinanciero.data.model.Ingreso
 import com.example.asistentefinanciero.data.repository.EgresoRepository
 import com.example.asistentefinanciero.data.repository.IngresoRepository
@@ -51,6 +52,7 @@ class EstadisticasViewModel : ViewModel() {
 
     // Cache de datos
     private var todosLosIngresos = listOf<Ingreso>()
+    private var todosLosEgresos = listOf<Egreso>()
 
     //Carga los ingresos del usuario y opcionalmente filtra por mes
     fun cargarIngresos(usuarioId: String, mes: Int? = null) {
