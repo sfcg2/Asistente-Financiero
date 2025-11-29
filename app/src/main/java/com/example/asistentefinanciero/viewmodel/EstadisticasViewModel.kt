@@ -50,9 +50,7 @@ class EstadisticasViewModel : ViewModel() {
     // Cache de datos
     private var todosLosIngresos = listOf<Ingreso>()
 
-    /**
-     * Carga los ingresos del usuario y opcionalmente filtra por mes
-     */
+    //Carga los ingresos del usuario y opcionalmente filtra por mes
     fun cargarIngresos(usuarioId: String, mes: Int? = null) {
         _mesFiltro.value = mes
 
@@ -68,25 +66,21 @@ class EstadisticasViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Cambia el filtro entre Ingresos y Egresos
-     */
+    //Cambia el filtro entre Ingresos y Egresos
+
     fun cambiarFiltro(filtro: FiltroEstadisticas) {
         _filtroActual.value = filtro
         actualizarDatosGrafico()
     }
 
-    /**
-     * Selecciona un mes específico para filtrar
-     */
+    //Selecciona un mes específico para filtrar
+
     fun seleccionarMes(mes: Int?, usuarioId: String) {
         _mesFiltro.value = mes
         cargarIngresos(usuarioId, mes)
     }
 
-    /**
-     * Actualiza los datos del gráfico según el filtro actual
-     */
+    //Actualiza los datos del gráfico según el filtro actual
     private fun actualizarDatosGrafico() {
         when (_filtroActual.value) {
             FiltroEstadisticas.INGRESOS -> {
@@ -99,10 +93,9 @@ class EstadisticasViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Procesa los ingresos y los agrupa por categoría para el gráfico
-     * Cada DatoGrafico contiene: categoría, monto TOTAL y porcentaje TOTAL
-     */
+    //Procesa los ingresos y los agrupa por categoría para el gráfico
+     //Cada DatoGrafico contiene: categoría, monto TOTAL y porcentaje TOTAL
+
     private fun procesarIngresosParaGrafico() {
         // 1. Filtrar por mes si es necesario
         val ingresosFiltrados = if (_mesFiltro.value != null) {
@@ -134,7 +127,7 @@ class EstadisticasViewModel : ViewModel() {
                 porcentajeTotal = if (granTotal > 0) (montoTotal / granTotal * 100).toFloat() else 0f,  // Porcentaje TOTAL
                 color = obtenerColorPorCategoria(categoria)
             )
-        }.sortedByDescending { it.montoTotal } // Ordenar de mayor a menor monto
+        }.sortedByDescending { it.montoTotal } // Ordena de mayor a menor monto
 
         _datosGrafico.value = datosParaGrafico
 
@@ -143,9 +136,8 @@ class EstadisticasViewModel : ViewModel() {
                     "Gran Total: $granTotal (Mes: ${_mesFiltro.value})")
     }
 
-    /**
-     * Obtiene el mes de una fecha en formato dd/MM/yyyy
-     */
+    //Obtenemos el mes de una fecha en formato dd/MM/yyyy
+
     private fun obtenerMesDeFecha(fechaString: String): Int? {
         return try {
             val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -160,26 +152,15 @@ class EstadisticasViewModel : ViewModel() {
             null
         }
     }
-
-    /**
-     * Asigna un color según la categoría
-     */
     private fun obtenerColorPorCategoria(categoria: String): Color {
         return when (categoria.lowercase()) {
-            // Tonos de verdes y azules para ingresos positivos
             "salario"     -> Color(0xFF1E88E5) // Azul brillante
             "freelance"   -> Color(0xFF4CAF50) // Verde medio (similar al original)
             "inversiones" -> Color(0xFFFFB300) // Ámbar oscuro
-
-            // Tonos más cálidos/distintivos para otras categorías
             "ventas"      -> Color(0xFFF4511E) // Naranja rojizo (dark orange)
             "bonos"       -> Color(0xFF8E24AA) // Morado oscuro/índigo
             "regalos"     -> Color(0xFFD81B60) // Rosa fuerte (fuchsia)
-
-            // Colores neutros/alternativos
             "otro"        -> Color(0xFF546E7A) // Gris azulado (slate gray)
-
-            // Color por defecto seguro
             else          -> Color(0xFF00ACC1) // Azul cian (cielish blue)
         }
     }

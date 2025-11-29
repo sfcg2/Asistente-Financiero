@@ -106,8 +106,6 @@ fun EstadisticaVista(
                 Box {
                     TextButton(
                         onClick = { mostrarMenuMes = !mostrarMenuMes },
-                        //modifier = Modifier.background(CardDark, RoundedCornerShape(10.dp))
-
                     ) {
                         Text(
                             text = mesSeleccionado,
@@ -238,13 +236,13 @@ fun EstadisticaVista(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 📊 ÁREA DEL GRÁFICO (arriba) Y CATEGORÍAS (abajo)
+            //GRÁFICO
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                // 📊 Card del Gráfico Circular (ARRIBA)
+                // Card del Gráfico Circular
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -288,7 +286,7 @@ fun EstadisticaVista(
                                 )
                             }
                         } else {
-                            // 🎨 GRÁFICO CIRCULAR
+                            // GRÁFICO CIRCULAR
                             GraficoCircular(
                                 datos = datosGrafico,
                                 modifier = Modifier
@@ -301,7 +299,7 @@ fun EstadisticaVista(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 📋 Categorías horizontales con FlowRow (ABAJO)
+                //Categorías horizontales con FlowRow
                 if (datosGrafico.isNotEmpty()) {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -387,7 +385,7 @@ fun EstadisticaVista(
     }
 }
 
-// 🏷️ Chip de categoría (solo nombre + color)
+// Chips de categoría (solo nombre + color)
 @Composable
 fun ChipCategoria(
     nombreCategoria: String,
@@ -420,8 +418,7 @@ fun ChipCategoria(
     }
 }
 
-// 🎨 Componente del Gráfico Circular
-// 🎨 Componente del Gráfico Circular
+//Componente del Gráfico Circular
 @Composable
 fun GraficoCircular(
     datos: List<com.example.asistentefinanciero.viewmodel.DatoGrafico>,
@@ -445,12 +442,12 @@ fun GraficoCircular(
                         val centerX = size.width / 2f
                         val centerY = size.height / 2f
 
-                        // Calcular la distancia desde el centro
+                        // Calcula la distancia desde el centro
                         val dx = offset.x - centerX
                         val dy = offset.y - centerY
                         val distance = kotlin.math.sqrt(dx * dx + dy * dy)
 
-                        val radius = kotlin.math.min(size.width, size.height) / 2f  // ✅ CORREGIDO
+                        val radius = kotlin.math.min(size.width, size.height) / 2f
                         val innerRadius = radius * 0.55f
 
                         // Solo procesar si el toque está dentro del anillo
@@ -476,11 +473,11 @@ fun GraficoCircular(
                     }
                 }
         ) {
-            val radius = kotlin.math.min(size.width, size.height) / 2f  // ✅ CORREGIDO
+            val radius = kotlin.math.min(size.width, size.height) / 2f
             val center = Offset(size.width / 2, size.height / 2)
             val innerRadius = radius * 0.55f
             val textRadius = radius * 0.75f
-            val explosionOffset = 15f // 🎯 Distancia de separación
+            val explosionOffset = 15f //Distancia de separación
 
             var startAngle = -90f
 
@@ -508,7 +505,7 @@ fun GraficoCircular(
                     Offset.Zero
                 }
 
-                // Calcular nueva posición del arco
+                // Calcula nueva posición del arco
                 val arcTopLeft = Offset(
                     center.x - radius + offset.x,
                     center.y - radius + offset.y
