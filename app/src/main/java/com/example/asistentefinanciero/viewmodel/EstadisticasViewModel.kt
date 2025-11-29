@@ -87,5 +87,93 @@ class EstadisticasViewModel : ViewModel() {
     /**
      * Actualiza los datos del gráfico según el filtro actual
      */
+    private fun actualizarDatosGrafico() {
+        when (_filtroActual.value) {
+            FiltroEstadisticas.INGRESOS -> {
+                procesarIngresosParaGrafico()
+            }
+            FiltroEstadisticas.EGRESOS -> {
+                // Por ahora vacío, implementarás después
+                _datosGrafico.value = emptyList()
+            }
+        }
+    }
 
+    /**
+     * Procesa los ingresos y los agrupa por categoría para el gráfico
+     * Cada DatoGrafico contiene: categoría, monto TOTAL y porcentaje TOTAL
+     */
+    private fun procesarIngresosParaGrafico() {
+        // 1. Filtrar por mes si es necesario
+        val ingresosFiltrados = if (_mesFiltro.value != null) {
+            todosLosIngresos.filter { ingreso ->
+                obtenerMesDeFecha(ingreso.obtenerFechaFormateada()) == _mesFiltro.value
+            }
+        } else {
+            todosLosIngresos
+        }
+
+        if (ingresosFiltrados.isEmpty()) {
+            _datosGrafico.value = emptyList()
+            return
+        }
+
+        // 2. Agrupar por categoría y sumar montos TOTALES
+        val agrupadoPorCategoria = ingresosFiltrados
+            .groupBy { it.categoria }
+            .mapValues { (_, ingresos) -> ingresos.sumOf { it.monto } }
+
+        // 3. Calcular el GRAN TOTAL para los porcentajes
+        val granTotal = agrupadoPorCategoria.values.sum()
+
+        // 4. Convertir a DatoGrafico con monto TOTAL y porcentaje TOTAL de cada categoría
+        val datosParaGrafico = agrupadoPorCategoria.map { (categoria, montoTotal) ->
+            DatoGrafico(
+                categoria = categoria,
+                montoTotal = montoTotal,  // Monto TOTAL de la categoría
+                porcentajeTotal = if (granTotal > 0) (montoTotal / granTotal * 100).toFloat() else 0f,  // Porcentaje TOTAL
+                color = obtenerColorPorCategoria(categoria)
+            )
+        }.sortedByDescending { it.montoTotal } // Ordenar de mayor a menor monto
+
+        _datosGrafico.value = datosParaGrafico
+
+        Log.d("EstadisticasViewModel",
+            "Datos del gráfico actualizados: ${datosParaGrafico.size} categorías, " +
+                    "Gran Total: $granTotal (Mes: ${_mesFiltro.value})")
+    }
+
+    /**
+     * Obtiene el mes de una fecha en formato dd/MM/yyyy
+     */
+    private fun obtenerMesDeFecha(fechaString: String): Int? {
+        return try {
+            val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = format.parse(fechaString)
+            if (date != null) {
+                val cal = Calendar.getInstance()
+                cal.time = date
+                cal.get(Calendar.MONTH) + 1 // Enero = 1, Diciembre = 12
+            } else null
+        } catch (e: Exception) {
+            Log.e("EstadisticasViewModel", "Error al parsear fecha: $fechaString", e)
+            null
+        }
+    }
+
+    /**
+     * Asigna un color según la categoría
+     */
+    private fun obtenerColorPorCategoria(categoria: String): Color {
+        return when (categoria.lowercase()) {
+            "salario" -> Color(0xFF31DA38)
+            "freelance" -> Color(0xFF2196F3)
+            "inversiones" -> Color(0xFFFF9800)
+            "ventas" -> Color(0xFF9C27B0)
+            "bonos" -> Color(0xFFCDDC39)
+            "regalos" -> Color(0xFFE91E63)
+            "otro" -> Color(0xFF71868C)
+            else -> Color(0xFF00BCD4)
+        }
+    }
 }
