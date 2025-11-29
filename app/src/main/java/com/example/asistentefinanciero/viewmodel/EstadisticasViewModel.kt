@@ -166,14 +166,21 @@ class EstadisticasViewModel : ViewModel() {
      */
     private fun obtenerColorPorCategoria(categoria: String): Color {
         return when (categoria.lowercase()) {
-            "salario" -> Color(0xFF31DA38)
-            "freelance" -> Color(0xFF2196F3)
-            "inversiones" -> Color(0xFFFF9800)
-            "ventas" -> Color(0xFF9C27B0)
-            "bonos" -> Color(0xFFCDDC39)
-            "regalos" -> Color(0xFFE91E63)
-            "otro" -> Color(0xFF71868C)
-            else -> Color(0xFF00BCD4)
+            // Tonos de verdes y azules para ingresos positivos
+            "salario"     -> Color(0xFF1E88E5) // Azul brillante
+            "freelance"   -> Color(0xFF4CAF50) // Verde medio (similar al original)
+            "inversiones" -> Color(0xFFFFB300) // Ámbar oscuro
+
+            // Tonos más cálidos/distintivos para otras categorías
+            "ventas"      -> Color(0xFFF4511E) // Naranja rojizo (dark orange)
+            "bonos"       -> Color(0xFF8E24AA) // Morado oscuro/índigo
+            "regalos"     -> Color(0xFFD81B60) // Rosa fuerte (fuchsia)
+
+            // Colores neutros/alternativos
+            "otro"        -> Color(0xFF546E7A) // Gris azulado (slate gray)
+
+            // Color por defecto seguro
+            else          -> Color(0xFF00ACC1) // Azul cian (cielish blue)
         }
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.sqrt
 import kotlin.math.atan2
 
+
 @Composable
 fun EstadisticaVista(
     viewModel: EstadisticasViewModel,
@@ -111,7 +112,7 @@ fun EstadisticaVista(
                         Text(
                             text = mesSeleccionado,
                             color = TextPrimary,
-                            fontSize = 14.sp,
+                            fontSize = 16.sp,
                         )
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
@@ -420,6 +421,7 @@ fun ChipCategoria(
 }
 
 // 🎨 Componente del Gráfico Circular
+// 🎨 Componente del Gráfico Circular
 @Composable
 fun GraficoCircular(
     datos: List<com.example.asistentefinanciero.viewmodel.DatoGrafico>,
@@ -427,66 +429,136 @@ fun GraficoCircular(
 ) {
     val totalMonto = datos.sumOf { it.montoTotal }
 
+    // ✨ Estado para rastrear qué categoría está seleccionada
+    var categoriaSeleccionada by remember { mutableStateOf<com.example.asistentefinanciero.viewmodel.DatoGrafico?>(null) }
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Canvas(
-            modifier = Modifier.size(220.dp)
+            modifier = Modifier
+                .size(220.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        // Calcular el centro del canvas
+                        val centerX = size.width / 2f
+                        val centerY = size.height / 2f
+
+                        // Calcular la distancia desde el centro
+                        val dx = offset.x - centerX
+                        val dy = offset.y - centerY
+                        val distance = kotlin.math.sqrt(dx * dx + dy * dy)
+
+                        val radius = kotlin.math.min(size.width, size.height) / 2f  // ✅ CORREGIDO
+                        val innerRadius = radius * 0.55f
+
+                        // Solo procesar si el toque está dentro del anillo
+                        if (distance in innerRadius..radius) {
+                            // Calcular el ángulo del toque
+                            var angle = Math.toDegrees(kotlin.math.atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                            angle = (angle + 90 + 360) % 360
+
+                            // Buscar qué sección fue tocada
+                            var currentAngle = 0f
+                            datos.forEach { dato ->
+                                val sweepAngle = (dato.porcentajeTotal / 100f) * 360f
+                                if (angle >= currentAngle && angle < currentAngle + sweepAngle) {
+                                    categoriaSeleccionada = if (categoriaSeleccionada == dato) null else dato
+                                    return@detectTapGestures
+                                }
+                                currentAngle += sweepAngle
+                            }
+                        } else if (distance < innerRadius) {
+                            // Si toca el centro, deseleccionar
+                            categoriaSeleccionada = null
+                        }
+                    }
+                }
         ) {
-            val radius = size.minDimension / 2f
+            val radius = kotlin.math.min(size.width, size.height) / 2f  // ✅ CORREGIDO
             val center = Offset(size.width / 2, size.height / 2)
             val innerRadius = radius * 0.55f
             val textRadius = radius * 0.75f
+            val explosionOffset = 15f // 🎯 Distancia de separación
 
             var startAngle = -90f
 
             // Pintura para texto dinámico
             val textPaint = android.graphics.Paint().apply {
-                textSize = 40f
+                textSize = 38f
                 textAlign = android.graphics.Paint.Align.CENTER
                 isFakeBoldText = true
             }
 
-            // --- DIBUJAR ARCOS ---
+            // --- DIBUJAR ARCOS CON EFECTO DE EXPLOSIÓN ---
             datos.forEach { dato ->
                 val sweepAngle = (dato.porcentajeTotal / 100f) * 360f
+                val midAngle = startAngle + sweepAngle / 2f
+
+                // 🎯 Calcular offset si está seleccionado
+                val isSelected = categoriaSeleccionada == dato
+                val offset = if (isSelected) {
+                    val rad = Math.toRadians(midAngle.toDouble())
+                    Offset(
+                        (explosionOffset * cos(rad)).toFloat(),
+                        (explosionOffset * sin(rad)).toFloat()
+                    )
+                } else {
+                    Offset.Zero
+                }
+
+                // Calcular nueva posición del arco
+                val arcTopLeft = Offset(
+                    center.x - radius + offset.x,
+                    center.y - radius + offset.y
+                )
 
                 drawArc(
                     color = dato.color,
                     startAngle = startAngle,
                     sweepAngle = sweepAngle,
                     useCenter = true,
-                    topLeft = Offset(center.x - radius, center.y - radius),
+                    topLeft = arcTopLeft,
                     size = Size(radius * 2, radius * 2)
                 )
 
                 startAngle += sweepAngle
             }
 
-            // --- TEXTO CENTRADO ---
+            // --- TEXTO EN CADA SECCIÓN ---
             startAngle = -90f
 
             datos.forEach { dato ->
                 val sweepAngle = (dato.porcentajeTotal / 100f) * 360f
                 val midAngle = startAngle + sweepAngle / 2f
-
                 val rad = Math.toRadians(midAngle.toDouble())
-                val x = (center.x + textRadius * cos(rad)).toFloat()
-                val y = (center.y + textRadius * sin(rad)).toFloat()
 
-                // 💡 Contraste automático del texto
+                // 🎯 Aplicar offset si está seleccionado
+                val isSelected = categoriaSeleccionada == dato
+                val sectionOffset = if (isSelected) {
+                    Offset(
+                        (explosionOffset * cos(rad)).toFloat(),
+                        (explosionOffset * sin(rad)).toFloat()
+                    )
+                } else {
+                    Offset.Zero
+                }
+
+                val x = (center.x + textRadius * cos(rad)).toFloat() + sectionOffset.x
+                val y = (center.y + textRadius * sin(rad)).toFloat() + sectionOffset.y
+
+                /* Contraste automático del texto
                 val (r, g, b) = listOf(
                     dato.color.red * 255,
                     dato.color.green * 255,
                     dato.color.blue * 255
                 )
-
                 val luminance = (0.299 * r + 0.587 * g + 0.114 * b)
+                textPaint.color = if (luminance < 128) android.graphics.Color.WHITE
+                else android.graphics.Color.BLACK*/
 
                 textPaint.color = android.graphics.Color.WHITE
-                    if (luminance < 128) android.graphics.Color.WHITE
-                    else android.graphics.Color.BLACK
 
                 // Dibujar porcentaje
                 drawIntoCanvas { canvas ->
@@ -509,15 +581,41 @@ fun GraficoCircular(
             )
         }
 
-        // --- TEXTO CENTRAL (TOTAL) ---
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Total", color = TextSecondary, fontSize = 12.sp)
-            Text(
-                "$${String.format("%,.0f", totalMonto)}",
-                color = TextPrimary,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+        // --- TEXTO CENTRAL ---
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
+            if (categoriaSeleccionada != null) {
+                // ✨ Mostrar categoría seleccionada
+                Text(
+                    text = categoriaSeleccionada!!.categoria,
+                    color = categoriaSeleccionada!!.color,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "$${String.format("%,.0f", categoriaSeleccionada!!.montoTotal)}",
+                    color = TextPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                /*Text(
+                    text = "${categoriaSeleccionada!!.porcentajeTotal.toInt()}%",
+                    color = TextSecondary,
+                    fontSize = 11.sp
+                )*/
+            } else {
+                // ✨ Mostrar total general
+                Text("Total", color = TextSecondary, fontSize = 12.sp)
+                Text(
+                    "$${String.format("%,.0f", totalMonto)}",
+                    color = TextPrimary,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
