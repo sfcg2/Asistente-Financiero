@@ -55,22 +55,36 @@ class EstadisticasViewModel : ViewModel() {
     private var todosLosEgresos = listOf<Egreso>()
 
     //Carga los ingresos del usuario y opcionalmente filtra por mes
-    fun cargarIngresos(usuarioId: String, mes: Int? = null) {
+    fun cargarDatos(usuarioId: String, mes: Int? = null) {
         _mesFiltro.value = mes
+        _isLoading.value = true
 
         viewModelScope.launch {
-            _isLoading.value = true
-            Log.d("EstadisticasViewModel", "Cargando ingresos del usuario: $usuarioId")
+            Log.d("EstadisticasViewModel", "Cargando datos del usuario: $usuarioId")
 
+            // 1. Cargar Ingresos
             ingresoRepository.obtenerIngresos(usuarioId) { ingresos ->
                 todosLosIngresos = ingresos
-                actualizarDatosGrafico()
-                _isLoading.value = false
+                if (_filtroActual.value == FiltroEstadisticas.INGRESOS) {
+                    actualizarDatosGrafico()
+                }
+                if (todosLosEgresos.isNotEmpty() || ingresos.isEmpty()) checkLoadingFinished()
+            }
+
+            // 2. Cargar Egresos
+            egresoRepository.obtenerEgresos(usuarioId) { egresos ->
+                todosLosEgresos = egresos
+                if (_filtroActual.value == FiltroEstadisticas.EGRESOS) {
+                    actualizarDatosGrafico()
+                }
+                checkLoadingFinished()
             }
         }
     }
 
-    //Cambia el filtro entre Ingresos y Egresos
+    private fun checkLoadingFinished() {
+        _isLoading.value = false
+    }
 
     fun cambiarFiltro(filtro: FiltroEstadisticas) {
         _filtroActual.value = filtro
@@ -81,64 +95,82 @@ class EstadisticasViewModel : ViewModel() {
 
     fun seleccionarMes(mes: Int?, usuarioId: String) {
         _mesFiltro.value = mes
-        cargarIngresos(usuarioId, mes)
+        actualizarDatosGrafico()
     }
 
     //Actualiza los datos del gráfico según el filtro actual
     private fun actualizarDatosGrafico() {
         when (_filtroActual.value) {
-            FiltroEstadisticas.INGRESOS -> {
-                procesarIngresosParaGrafico()
-            }
-            FiltroEstadisticas.EGRESOS -> {
-                // Por ahora vacío, implementarás después
-                _datosGrafico.value = emptyList()
-            }
+            FiltroEstadisticas.INGRESOS -> procesarIngresosParaGrafico()
+            FiltroEstadisticas.EGRESOS -> procesarEgresosParaGrafico()
         }
     }
 
-    //Procesa los ingresos y los agrupa por categoría para el gráfico
-     //Cada DatoGrafico contiene: categoría, monto TOTAL y porcentaje TOTAL
 
+    // --- LÓGICA DE INGRESOS ---
     private fun procesarIngresosParaGrafico() {
-        // 1. Filtrar por mes si es necesario
         val ingresosFiltrados = if (_mesFiltro.value != null) {
             todosLosIngresos.filter { ingreso ->
                 obtenerMesDeFecha(ingreso.obtenerFechaFormateada()) == _mesFiltro.value
             }
-        } else {
-            todosLosIngresos
-        }
+        } else todosLosIngresos
 
         if (ingresosFiltrados.isEmpty()) {
             _datosGrafico.value = emptyList()
             return
         }
 
-        // 2. Agrupar por categoría y sumar montos TOTALES
         val agrupadoPorCategoria = ingresosFiltrados
             .groupBy { it.categoria }
             .mapValues { (_, ingresos) -> ingresos.sumOf { it.monto } }
 
-        // 3. Calcular el GRAN TOTAL para los porcentajes
         val granTotal = agrupadoPorCategoria.values.sum()
 
-        // 4. Convertir a DatoGrafico con monto TOTAL y porcentaje TOTAL de cada categoría
         val datosParaGrafico = agrupadoPorCategoria.map { (categoria, montoTotal) ->
             DatoGrafico(
                 categoria = categoria,
-                montoTotal = montoTotal,  // Monto TOTAL de la categoría
-                porcentajeTotal = if (granTotal > 0) (montoTotal / granTotal * 100).toFloat() else 0f,  // Porcentaje TOTAL
-                color = obtenerColorPorCategoria(categoria)
+                montoTotal = montoTotal,
+                porcentajeTotal = if (granTotal > 0) (montoTotal / granTotal * 100).toFloat() else 0f,
+                color = obtenerColorPorCategoria(categoria, esGasto = false)
             )
-        }.sortedByDescending { it.montoTotal } // Ordena de mayor a menor monto
+        }.sortedByDescending { it.montoTotal }
+
+        _datosGrafico.value = datosParaGrafico
+    }
+
+    // --- LÓGICA DE EGRESOS ---
+    private fun procesarEgresosParaGrafico() {
+        val egresosFiltrados = if (_mesFiltro.value != null) {
+            todosLosEgresos.filter { egreso ->
+                obtenerMesDeFecha(egreso.obtenerFechaFormateada()) == _mesFiltro.value
+            }
+        } else todosLosEgresos
+
+        if (egresosFiltrados.isEmpty()) {
+            _datosGrafico.value = emptyList()
+            return
+        }
+
+        val agrupadoPorCategoria = egresosFiltrados
+            .groupBy { it.categoria }
+            .mapValues { (_, egresos) -> egresos.sumOf { it.monto } }
+
+        val granTotal = agrupadoPorCategoria.values.sum()
+
+        val datosParaGrafico = agrupadoPorCategoria.map { (categoria, montoTotal) ->
+            DatoGrafico(
+                categoria = categoria,
+                montoTotal = montoTotal,
+                porcentajeTotal = if (granTotal > 0) (montoTotal / granTotal * 100).toFloat() else 0f,
+                color = obtenerColorPorCategoria(categoria, esGasto = true)
+            )
+        }.sortedByDescending { it.montoTotal }
 
         _datosGrafico.value = datosParaGrafico
 
-        Log.d("EstadisticasViewModel",
-            "Datos del gráfico actualizados: ${datosParaGrafico.size} categorías, " +
-                    "Gran Total: $granTotal (Mes: ${_mesFiltro.value})")
+        Log.d("EstadisticasViewModel", "Egresos procesados. Total: $granTotal")
     }
+
 
     //Obtenemos el mes de una fecha en formato dd/MM/yyyy
 
