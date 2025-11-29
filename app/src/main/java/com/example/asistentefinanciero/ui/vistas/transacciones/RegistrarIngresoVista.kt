@@ -32,6 +32,8 @@ fun RegistrarIngresoVista(
     modifier: Modifier = Modifier,
     usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
     onVolver: () -> Unit = {},
+    onVerCalendario: () -> Unit = {},
+    onVerInicio: () -> Unit = {},
     onVerHistorial: () -> Unit = {}
 ) {
     // Estados del ViewModel
@@ -74,7 +76,7 @@ fun RegistrarIngresoVista(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
         ) {
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -105,7 +107,7 @@ fun RegistrarIngresoVista(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Icono y título
             Column(
@@ -145,8 +147,8 @@ fun RegistrarIngresoVista(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF00E676),
                     unfocusedBorderColor = Color(0xFF424242),
-                    focusedContainerColor = SurfaceDark,
-                    unfocusedContainerColor = SurfaceDark,
+                    focusedContainerColor = CardDark,
+                    unfocusedContainerColor = CardDark,
                     focusedTextColor = TextPrimary,
                     unfocusedTextColor = TextPrimary,
                     cursorColor = Color(0xFF00E676)
@@ -175,8 +177,8 @@ fun RegistrarIngresoVista(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF424242),
                         unfocusedBorderColor = Color(0xFF424242),
-                        focusedContainerColor = SurfaceDark,
-                        unfocusedContainerColor = SurfaceDark,
+                        focusedContainerColor = CardDark,
+                        unfocusedContainerColor = CardDark,
                         focusedTextColor = if (categoria.isEmpty()) Color(0xFFB4B4B4) else TextPrimary,
                         unfocusedTextColor = if (categoria.isEmpty()) Color(0xFFB4B4B4) else TextPrimary
                     ),
@@ -196,6 +198,7 @@ fun RegistrarIngresoVista(
                     expanded = mostrarMenuCategoria,
                     onDismissRequest = { mostrarMenuCategoria = false },
                     modifier = Modifier.background(SurfaceDark)
+                        .size(200.dp)
                 ) {
                     listOf("Salario", "Freelance", "Inversiones", "Ventas", "Bonos", "Regalos", "Otro").forEach {
                         DropdownMenuItem(
@@ -225,8 +228,8 @@ fun RegistrarIngresoVista(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF424242),
                         unfocusedBorderColor = Color(0xFF424242),
-                        focusedContainerColor = SurfaceDark,
-                        unfocusedContainerColor = SurfaceDark,
+                        focusedContainerColor = CardDark,
+                        unfocusedContainerColor = CardDark,
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary,
                         disabledBorderColor = Color(0xFF424242),
@@ -248,14 +251,14 @@ fun RegistrarIngresoVista(
                 OutlinedTextField(
                     value = hora,
                     onValueChange = {},
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(0.8f),
                     readOnly = true,
                     placeholder = { Text("Hora", color = Color(0xFFB4B4B4)) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF424242),
                         unfocusedBorderColor = Color(0xFF424242),
-                        focusedContainerColor = SurfaceDark,
-                        unfocusedContainerColor = SurfaceDark,
+                        focusedContainerColor = CardDark,
+                        unfocusedContainerColor = CardDark,
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary,
                         disabledBorderColor = Color(0xFF424242),
@@ -286,8 +289,8 @@ fun RegistrarIngresoVista(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF424242),
                     unfocusedBorderColor = Color(0xFF424242),
-                    focusedContainerColor = SurfaceDark,
-                    unfocusedContainerColor = SurfaceDark,
+                    focusedContainerColor = CardDark,
+                    unfocusedContainerColor = CardDark,
                     focusedTextColor = TextPrimary,
                     unfocusedTextColor = TextPrimary,
                     cursorColor = Color(0xFF00E676)
@@ -308,8 +311,8 @@ fun RegistrarIngresoVista(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF424242),
                         unfocusedBorderColor = Color(0xFF424242),
-                        focusedContainerColor = SurfaceDark,
-                        unfocusedContainerColor = SurfaceDark,
+                        focusedContainerColor = CardDark,
+                        unfocusedContainerColor = CardDark,
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary
                     ),
@@ -329,6 +332,7 @@ fun RegistrarIngresoVista(
                     expanded = mostrarMenuRepetir,
                     onDismissRequest = { mostrarMenuRepetir = false },
                     modifier = Modifier.background(SurfaceDark)
+                        .size(200.dp)
                 ) {
                     listOf("No se repite", "Diario", "Semanal", "Mensual", "Anual").forEach {
                         DropdownMenuItem(
@@ -459,9 +463,9 @@ fun RegistrarIngresoVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 0.dp, vertical = 10.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -475,28 +479,30 @@ fun RegistrarIngresoVista(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = onVerCalendario) {
                         Icon(
-                            imageVector = Icons.Default.CalendarToday,
+                            imageVector = Icons.Default.DateRange,
                             contentDescription = "Calendario",
-                            tint = TextSecondary
+                            tint = TextSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text("Calendario", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
-                    IconButton(onClick = onVolver) {
+                    IconButton(onClick = onVerInicio) {
                         Icon(
                             imageVector = Icons.Default.Home,
                             contentDescription = "Inicio",
-                            tint = TextSecondary
+                            tint = TextSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text("Inicio", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -507,10 +513,11 @@ fun RegistrarIngresoVista(
                         Icon(
                             imageVector = Icons.Default.List,
                             contentDescription = "Historial",
-                            tint = TextSecondary
+                            tint = TextSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text("Historial", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }
@@ -607,5 +614,6 @@ fun RegistrarIngresoVista(
                 containerColor = SurfaceDark
             )
         }
+
     }
 }

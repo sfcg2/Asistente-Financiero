@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.asistentefinanciero.ui.vistas.egreso.RegistrarEgresoVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
 import com.example.asistentefinanciero.ui.vistas.home.HomeVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
@@ -62,6 +62,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
                 onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
             )
         }
@@ -72,6 +74,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
                 onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
             )
         }
