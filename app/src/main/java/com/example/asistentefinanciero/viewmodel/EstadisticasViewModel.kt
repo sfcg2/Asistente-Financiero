@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.asistentefinanciero.data.model.Ingreso
+import com.example.asistentefinanciero.data.repository.EgresoRepository
 import com.example.asistentefinanciero.data.repository.IngresoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +31,7 @@ data class DatoGrafico(
 class EstadisticasViewModel : ViewModel() {
 
     private val ingresoRepository = IngresoRepository()
+    private val egresoRepository = EgresoRepository()
 
     // Estado del filtro actual (Ingresos o Egresos)
     private val _filtroActual = MutableStateFlow(FiltroEstadisticas.INGRESOS)
