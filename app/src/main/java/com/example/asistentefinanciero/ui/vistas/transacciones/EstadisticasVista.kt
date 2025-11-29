@@ -28,10 +28,11 @@ import com.google.accompanist.flowlayout.FlowRow
 import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.sqrt
 import kotlin.math.atan2
-
 
 @Composable
 fun EstadisticaVista(
@@ -45,14 +46,13 @@ fun EstadisticaVista(
 ) {
     var mesSeleccionado by remember { mutableStateOf("Mes") }
     var mostrarMenuMes by remember { mutableStateOf(false) }
+
+    // Observamos el estado del ViewModel
     val filtroActual by viewModel.filtroActual.collectAsState()
     val datosGrafico by viewModel.datosGrafico.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // Cargar datos al iniciar
-    LaunchedEffect(Unit) {
-        viewModel.cargarIngresos(usuarioId)
-    }
+    // Nota: Se eliminó el LaunchedEffect de carga inicial como pediste.
 
     Box(
         modifier = modifier
@@ -95,14 +95,11 @@ fun EstadisticaVista(
 
             Spacer(modifier = Modifier.height(5.dp))
 
+            // Selector de Mes
             Row(
-                modifier = Modifier.fillMaxWidth(), // Asegura que ocupe todo el ancho
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-
-            )
-
-            {
-                // Menu desplegable para el mes
+            ) {
                 Box {
                     TextButton(
                         onClick = { mostrarMenuMes = !mostrarMenuMes },
@@ -117,7 +114,6 @@ fun EstadisticaVista(
                             contentDescription = "Seleccionar mes",
                             tint = TextPrimary,
                             modifier = Modifier.size(20.dp)
-
                         )
                     }
 
@@ -153,10 +149,9 @@ fun EstadisticaVista(
                 }
             }
 
-
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Filtros (Ingresos, Egresos)
+            // Botones de Filtro (Ingresos vs Egresos)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -236,7 +231,7 @@ fun EstadisticaVista(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            //GRÁFICO
+            // GRÁFICO
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -272,8 +267,9 @@ fun EstadisticaVista(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
+                                // Ícono dinámico según si estamos en Ingresos o Egresos
                                 Icon(
-                                    imageVector = Icons.Default.TrendingUp,
+                                    imageVector = if (filtroActual == FiltroEstadisticas.INGRESOS) Icons.Default.TrendingUp else Icons.Default.TrendingDown,
                                     contentDescription = null,
                                     tint = TextSecondary,
                                     modifier = Modifier.size(48.dp)
@@ -299,7 +295,7 @@ fun EstadisticaVista(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                //Categorías horizontales con FlowRow
+                // Categorías horizontales con FlowRow
                 if (datosGrafico.isNotEmpty()) {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -418,7 +414,7 @@ fun ChipCategoria(
     }
 }
 
-//Componente del Gráfico Circular
+// Componente del Gráfico Circular
 @Composable
 fun GraficoCircular(
     datos: List<com.example.asistentefinanciero.viewmodel.DatoGrafico>,
@@ -426,7 +422,7 @@ fun GraficoCircular(
 ) {
     val totalMonto = datos.sumOf { it.montoTotal }
 
-    // ✨ Estado para rastrear qué categoría está seleccionada
+    // Estado para rastrear qué categoría está seleccionada
     var categoriaSeleccionada by remember { mutableStateOf<com.example.asistentefinanciero.viewmodel.DatoGrafico?>(null) }
 
     Box(
@@ -477,7 +473,7 @@ fun GraficoCircular(
             val center = Offset(size.width / 2, size.height / 2)
             val innerRadius = radius * 0.55f
             val textRadius = radius * 0.75f
-            val explosionOffset = 15f //Distancia de separación
+            val explosionOffset = 15f // Distancia de separación
 
             var startAngle = -90f
 
@@ -486,6 +482,7 @@ fun GraficoCircular(
                 textSize = 38f
                 textAlign = android.graphics.Paint.Align.CENTER
                 isFakeBoldText = true
+                color = android.graphics.Color.WHITE
             }
 
             // --- DIBUJAR ARCOS CON EFECTO DE EXPLOSIÓN ---
@@ -493,7 +490,7 @@ fun GraficoCircular(
                 val sweepAngle = (dato.porcentajeTotal / 100f) * 360f
                 val midAngle = startAngle + sweepAngle / 2f
 
-                // 🎯 Calcular offset si está seleccionado
+                // Calcular offset si está seleccionado
                 val isSelected = categoriaSeleccionada == dato
                 val offset = if (isSelected) {
                     val rad = Math.toRadians(midAngle.toDouble())
@@ -531,7 +528,7 @@ fun GraficoCircular(
                 val midAngle = startAngle + sweepAngle / 2f
                 val rad = Math.toRadians(midAngle.toDouble())
 
-                // 🎯 Aplicar offset si está seleccionado
+                // Aplicar offset si está seleccionado
                 val isSelected = categoriaSeleccionada == dato
                 val sectionOffset = if (isSelected) {
                     Offset(
@@ -545,26 +542,16 @@ fun GraficoCircular(
                 val x = (center.x + textRadius * cos(rad)).toFloat() + sectionOffset.x
                 val y = (center.y + textRadius * sin(rad)).toFloat() + sectionOffset.y
 
-                /* Contraste automático del texto
-                val (r, g, b) = listOf(
-                    dato.color.red * 255,
-                    dato.color.green * 255,
-                    dato.color.blue * 255
-                )
-                val luminance = (0.299 * r + 0.587 * g + 0.114 * b)
-                textPaint.color = if (luminance < 128) android.graphics.Color.WHITE
-                else android.graphics.Color.BLACK*/
-
-                textPaint.color = android.graphics.Color.WHITE
-
-                // Dibujar porcentaje
-                drawIntoCanvas { canvas ->
-                    canvas.nativeCanvas.drawText(
-                        "${dato.porcentajeTotal.toInt()}%",
-                        x,
-                        y,
-                        textPaint
-                    )
+                // Solo dibujar porcentaje si es mayor a 5% para que no se amontonen
+                if (dato.porcentajeTotal > 5) {
+                    drawIntoCanvas { canvas ->
+                        canvas.nativeCanvas.drawText(
+                            "${dato.porcentajeTotal.toInt()}%",
+                            x,
+                            y + 10, // Ajuste vertical ligero para centrar
+                            textPaint
+                        )
+                    }
                 }
 
                 startAngle += sweepAngle
@@ -584,7 +571,7 @@ fun GraficoCircular(
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
             if (categoriaSeleccionada != null) {
-                // ✨ Mostrar categoría seleccionada
+                // Mostrar categoría seleccionada
                 Text(
                     text = categoriaSeleccionada!!.categoria,
                     color = categoriaSeleccionada!!.color,
@@ -598,13 +585,8 @@ fun GraficoCircular(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                /*Text(
-                    text = "${categoriaSeleccionada!!.porcentajeTotal.toInt()}%",
-                    color = TextSecondary,
-                    fontSize = 11.sp
-                )*/
             } else {
-                // ✨ Mostrar total general
+                // Mostrar total general
                 Text("Total", color = TextSecondary, fontSize = 12.sp)
                 Text(
                     "$${String.format("%,.0f", totalMonto)}",
@@ -616,3 +598,4 @@ fun GraficoCircular(
         }
     }
 }
+
