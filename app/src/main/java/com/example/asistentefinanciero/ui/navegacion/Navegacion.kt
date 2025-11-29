@@ -6,12 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.asistentefinanciero.ui.vistas.egreso.RegistrarEgresoVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
 import com.example.asistentefinanciero.ui.vistas.home.HomeVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.EstadisticaVista
 import com.example.asistentefinanciero.viewmodel.EgresoViewModel
+import com.example.asistentefinanciero.viewmodel.EstadisticasViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.IngresoViewModel
 
@@ -35,6 +37,7 @@ fun AppNavigation(
 ) {
     var navState by remember { mutableStateOf(NavState(Pantalla.HOME)) }
     val historialViewModel: HistorialViewModel = viewModel() // Creamos el ViewModel una sola vez aquí
+    val estadisticasViewModel: EstadisticasViewModel = viewModel()
 
     when (navState.pantalla) {
         Pantalla.HOME -> {
@@ -59,6 +62,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
                 onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
             )
         }
@@ -69,6 +74,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
                 onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
             )
         }
@@ -96,7 +103,14 @@ fun AppNavigation(
         }
 
         Pantalla.ESTADISTICAS -> {
-            // TODO: Implementar vista de estadísticas
+            EstadisticaVista(
+                viewModel = estadisticasViewModel,
+                usuarioId = usuarioId,
+                onVolver = { navState = NavState(Pantalla.HOME) },
+                onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
+                onVerHistorial = { navState = NavState(Pantalla.HISTORIAL) }
+            )
         }
     }
 }
