@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asistentefinanciero.ui.theme.BackgroundDark // Ajusta si es necesario
+import com.example.asistentefinanciero.ui.theme.CardDark
 import com.example.asistentefinanciero.ui.theme.SurfaceDark   // Ajusta si es necesario
 import com.example.asistentefinanciero.ui.theme.TextPrimary    // Ajusta si es necesario
 import com.example.asistentefinanciero.ui.theme.TextSecondary  // Ajusta si es necesario
@@ -115,9 +116,9 @@ fun CalendarioVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 0.dp, vertical = 35.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -127,14 +128,13 @@ fun CalendarioVista(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón Calendario (ACTIVO)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
@@ -142,20 +142,14 @@ fun CalendarioVista(
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "Calendario",
-                            tint = Color.White,
-                            modifier = Modifier.size(28.dp)
+                            tint = TextSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Calendario",
-                        color = TextPrimary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+
+                    //Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
                 }
 
-                // Botón Inicio
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -168,14 +162,9 @@ fun CalendarioVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Inicio",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
-                // Botón Historial
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -188,11 +177,7 @@ fun CalendarioVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Historial",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                    //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }
@@ -208,7 +193,7 @@ fun MesCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        colors = CardDefaults.cardColors(containerColor = CardDark),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(

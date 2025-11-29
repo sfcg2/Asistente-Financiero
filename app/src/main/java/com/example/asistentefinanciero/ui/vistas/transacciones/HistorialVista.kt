@@ -174,13 +174,14 @@ fun HistorialVista(
         }
 
         // Barra de navegación inferior
+// Barra de navegación inferior
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 0.dp, vertical = 35.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -190,7 +191,6 @@ fun HistorialVista(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón Calendario
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -203,14 +203,9 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Calendario",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                    //Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
                 }
 
-                // Botón Inicio
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
@@ -223,41 +218,30 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Inicio",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
-                // Botón Historial (Actual)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
-                    ) {
+                    ){
                         Icon(
                             imageVector = Icons.Default.List,
                             contentDescription = "Historial",
-                            tint = Color.White,
-                            modifier = Modifier.size(28.dp)
+                            tint = TextSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Historial",
-                        color = TextPrimary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
                 }
             }
+            //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
         }
     }
 }
@@ -282,7 +266,7 @@ fun FiltroButton(
     ) {
         Text(
             text = texto,
-            fontSize = 14.sp,
+            fontSize = if (seleccionado) 13.sp else 14.sp ,
             fontWeight = if (seleccionado) FontWeight.Bold else FontWeight.Normal
         )
     }
@@ -295,7 +279,7 @@ fun TransaccionCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
+        colors = CardDefaults.cardColors(containerColor = CardDark),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
