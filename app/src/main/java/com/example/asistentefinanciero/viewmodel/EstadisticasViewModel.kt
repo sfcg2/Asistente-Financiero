@@ -53,4 +53,39 @@ class EstadisticasViewModel : ViewModel() {
     /**
      * Carga los ingresos del usuario y opcionalmente filtra por mes
      */
+    fun cargarIngresos(usuarioId: String, mes: Int? = null) {
+        _mesFiltro.value = mes
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            Log.d("EstadisticasViewModel", "Cargando ingresos del usuario: $usuarioId")
+
+            ingresoRepository.obtenerIngresos(usuarioId) { ingresos ->
+                todosLosIngresos = ingresos
+                actualizarDatosGrafico()
+                _isLoading.value = false
+            }
+        }
     }
+
+    /**
+     * Cambia el filtro entre Ingresos y Egresos
+     */
+    fun cambiarFiltro(filtro: FiltroEstadisticas) {
+        _filtroActual.value = filtro
+        actualizarDatosGrafico()
+    }
+
+    /**
+     * Selecciona un mes específico para filtrar
+     */
+    fun seleccionarMes(mes: Int?, usuarioId: String) {
+        _mesFiltro.value = mes
+        cargarIngresos(usuarioId, mes)
+    }
+
+    /**
+     * Actualiza los datos del gráfico según el filtro actual
+     */
+
+}
