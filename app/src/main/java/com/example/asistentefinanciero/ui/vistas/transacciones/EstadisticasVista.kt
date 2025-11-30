@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asistentefinanciero.ui.theme.*
@@ -29,9 +28,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import kotlin.math.sqrt
-import kotlin.math.atan2
-
 
 @Composable
 fun EstadisticaVista(
@@ -51,7 +47,7 @@ fun EstadisticaVista(
 
     // Cargar datos al iniciar
     LaunchedEffect(Unit) {
-        viewModel.cargarIngresos(usuarioId)
+        viewModel.cargarDatos(usuarioId)
     }
 
     Box(

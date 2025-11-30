@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-// Enum para el filtro
+
 enum class FiltroEstadisticas {
     INGRESOS, EGRESOS
 }
@@ -196,26 +196,27 @@ class EstadisticasViewModel : ViewModel() {
 
         return if (esGasto) {
             when (catLower) {
-                "alimentación", "comida", "restaurante" -> Color(0xFFEF5350)
-                "transporte", "gasolina", "taxi" -> Color(0xFF42A5F5)
-                "vivienda", "alquiler", "casa" -> Color(0xFF8D6E63)
-                "servicios", "luz", "agua", "internet" -> Color(0xFFFFCA28)
-                "salud", "medicina", "farmacia" -> Color(0xFF66BB6A)
-                "ocio", "cine", "entretenimiento" -> Color(0xFFAB47BC)
-                "educación", "universidad", "libros" -> Color(0xFF5C6BC0)
-                "ropa", "vestimenta" -> Color(0xFF26A69A)
-                "mascotas" -> Color(0xFFFFA726)
-                else -> Color(0xFF78909C)
+                "comida" -> Color(0xFFF4511E)
+                "transporte" -> Color(0xFF1E88E5)
+                "arriendo" -> Color(0xFF8D6E63)
+                "servicios" -> Color(0xFFFFCA28)
+                "salud" -> Color(0xFF4CAF50)
+                "entretenimiento" -> Color(0xFF8E24AA)
+                "educación" -> Color(0xFF5C6BC0)
+                "ropa" -> Color(0xFFD81B60)
+                "otro" -> Color(0xFF546E7A)
+                else -> Color(0xFF3F51B5)
             }
         } else {
             when (catLower) {
-                "salario", "sueldo", "nomina" -> Color(0xFF1E88E5)
-                "freelance", "trabajos extra" -> Color(0xFF4CAF50)
-                "inversiones", "dividendos" -> Color(0xFFFFB300)
+                "salario" -> Color(0xFF1E88E5)
+                "freelance" -> Color(0xFF4CAF50)
+                "inversiones" -> Color(0xFFFFB300)
                 "ventas" -> Color(0xFFF4511E)
-                "bonos", "premios" -> Color(0xFF8E24AA)
+                "bonos" -> Color(0xFF8E24AA)
                 "regalos" -> Color(0xFFD81B60)
-                else -> Color(0xFF546E7A)
+                "otro" -> Color(0xFF546E7A)
+                else -> Color(0xFF3F51B5)
             }
         }
     }
