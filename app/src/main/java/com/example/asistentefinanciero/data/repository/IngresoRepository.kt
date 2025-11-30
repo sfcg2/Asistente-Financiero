@@ -41,4 +41,49 @@ class IngresoRepository {
                 onResult(ingresos)
             }
     }
+
+    // Nueva función para actualizar ingreso
+    suspend fun actualizarIngreso(usuarioId: String, ingreso: Ingreso): Boolean {
+        return try {
+            baseDeDatos.collection("usuarios")
+                .document(usuarioId)
+                .collection("ingresos")
+                .document(ingreso.id)
+                .set(ingreso)
+                .await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Nueva función para eliminar ingreso
+    suspend fun eliminarIngreso(usuarioId: String, ingresoId: String): Boolean {
+        return try {
+            baseDeDatos.collection("usuarios")
+                .document(usuarioId)
+                .collection("ingresos")
+                .document(ingresoId)
+                .delete()
+                .await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Nueva función para obtener un ingreso específico
+    suspend fun obtenerIngreso(usuarioId: String, ingresoId: String): Ingreso? {
+        return try {
+            val doc = baseDeDatos.collection("usuarios")
+                .document(usuarioId)
+                .collection("ingresos")
+                .document(ingresoId)
+                .get()
+                .await()
+            doc.toObject(Ingreso::class.java)?.copy(id = doc.id)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

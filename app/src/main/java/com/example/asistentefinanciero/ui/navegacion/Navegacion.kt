@@ -12,23 +12,28 @@ import com.example.asistentefinanciero.ui.vistas.home.HomeVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.EstadisticaVista
+import com.example.asistentefinanciero.ui.vistas.transacciones.EditarTransaccionVista
 import com.example.asistentefinanciero.viewmodel.EgresoViewModel
 import com.example.asistentefinanciero.viewmodel.EstadisticasViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.IngresoViewModel
+import com.example.asistentefinanciero.viewmodel.EditarTransaccionViewModel
 
 enum class Pantalla {
     HOME,
     REGISTRAR_INGRESO,
     REGISTRAR_EGRESO,
     HISTORIAL,
+    EDITAR_TRANSACCION,
     CALENDARIO,
     ESTADISTICAS
 }
 
 data class NavState(
     val pantalla: Pantalla,
-    val mesFiltro: Int? = null // Argumento para filtrar el historial por mes (1-12)
+    val mesFiltro: Int? = null, // Argumento para filtrar el historial por mes (1-12)
+    val transaccionId: String = "", // ID de la transacción a editar
+    val esIngreso: Boolean = true // Tipo de transacción a editar
 )
 
 @Composable
@@ -88,7 +93,25 @@ fun AppNavigation(
                 mesFiltroInicial = navState.mesFiltro,
                 onVolver = { navState = NavState(Pantalla.HOME) },
                 onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
-                onVerInicio = { navState = NavState(Pantalla.HOME) }
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
+                onEditarTransaccion = { transaccionId, esIngreso ->
+                    navState = NavState(
+                        pantalla = Pantalla.EDITAR_TRANSACCION,
+                        transaccionId = transaccionId,
+                        esIngreso = esIngreso
+                    )
+                }
+            )
+        }
+
+        Pantalla.EDITAR_TRANSACCION -> {
+            val viewModel: EditarTransaccionViewModel = viewModel()
+            EditarTransaccionVista(
+                viewModel = viewModel,
+                usuarioId = usuarioId,
+                transaccionId = navState.transaccionId,
+                esIngreso = navState.esIngreso,
+                onVolver = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = navState.mesFiltro) }
             )
         }
 
@@ -96,9 +119,10 @@ fun AppNavigation(
             CalendarioVista(
                 onVolver = { navState = NavState(Pantalla.HOME) },
                 onMesSeleccionado = { mes ->
-                    navState = NavState(Pantalla.HISTORIAL, mesFiltro = mes)},
-                    onVerInicio = { navState = NavState(Pantalla.HOME) },
-                    onVerHistorial = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = null) }
+                    navState = NavState(Pantalla.HISTORIAL, mesFiltro = mes)
+                },
+                onVerInicio = { navState = NavState(Pantalla.HOME) },
+                onVerHistorial = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = null) }
             )
         }
 

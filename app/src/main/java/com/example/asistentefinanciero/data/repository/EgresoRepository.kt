@@ -6,11 +6,11 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 
 class EgresoRepository {
-    private val db = FirebaseFirestore.getInstance()
+    private val baseDeDatos = FirebaseFirestore.getInstance()
 
     suspend fun guardarEgreso(usuarioId: String, egreso: Egreso): Boolean {
         return try {
-            db.collection("usuarios")
+            baseDeDatos.collection("usuarios")
                 .document(usuarioId)
                 .collection("egresos")
                 .add(egreso)
@@ -22,7 +22,7 @@ class EgresoRepository {
     }
 
     fun obtenerEgresos(usuarioId: String, onResult: (List<Egreso>) -> Unit) {
-        db.collection("usuarios")
+        baseDeDatos.collection("usuarios")
             .document(usuarioId)
             .collection("egresos")
             .orderBy("fecha", Query.Direction.DESCENDING)
@@ -38,5 +38,50 @@ class EgresoRepository {
 
                 onResult(egresos)
             }
+    }
+
+    // Nueva función para actualizar egreso
+    suspend fun actualizarEgreso(usuarioId: String, egreso: Egreso): Boolean {
+        return try {
+            baseDeDatos.collection("usuarios")
+                .document(usuarioId)
+                .collection("egresos")
+                .document(egreso.id)
+                .set(egreso)
+                .await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Nueva función para eliminar egreso
+    suspend fun eliminarEgreso(usuarioId: String, egresoId: String): Boolean {
+        return try {
+            baseDeDatos.collection("usuarios")
+                .document(usuarioId)
+                .collection("egresos")
+                .document(egresoId)
+                .delete()
+                .await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Nueva función para obtener un egreso específico
+    suspend fun obtenerEgreso(usuarioId: String, egresoId: String): Egreso? {
+        return try {
+            val doc = baseDeDatos.collection("usuarios")
+                .document(usuarioId)
+                .collection("egresos")
+                .document(egresoId)
+                .get()
+                .await()
+            doc.toObject(Egreso::class.java)?.copy(id = doc.id)
+        } catch (e: Exception) {
+            null
+        }
     }
 }

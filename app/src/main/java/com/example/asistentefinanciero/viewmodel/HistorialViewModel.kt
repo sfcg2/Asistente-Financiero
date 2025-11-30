@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-// --- Modelos de Datos Requeridos ---
 
 data class TransaccionItem(
     val id: String,

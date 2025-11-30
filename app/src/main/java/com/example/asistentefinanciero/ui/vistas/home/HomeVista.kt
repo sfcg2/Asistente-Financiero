@@ -328,14 +328,14 @@ fun HomeVista(
         }
 
 
-        // --- BARRA DE NAVEGACIÓN INFERIOR (Sin modificar) ---
+        // --- BARRA DE NAVEGACIÓN INFERIOR ---
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 0.dp, vertical = 35.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(30.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -357,7 +357,10 @@ fun HomeVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
+                    Text(
+                        text = "Calendario",
+                        color = TextSecondary,
+                        fontSize = 10.sp)
                 }
 
                 Column(
@@ -366,7 +369,7 @@ fun HomeVista(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(56.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
@@ -378,7 +381,7 @@ fun HomeVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -393,7 +396,7 @@ fun HomeVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.example.asistentefinanciero.ui.vistas.transacciones
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.asistentefinanciero.ui.theme.* // Asegúrate de que tus imports de tema son correctos
+import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.FiltroHistorial
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
@@ -27,13 +28,13 @@ import java.util.Locale
 @Composable
 fun HistorialVista(
     viewModel: HistorialViewModel,
-    usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
-    // ✨ MODIFICACIÓN CLAVE: Parámetro para recibir el filtro de mes.
+    usuarioId: String = "usuario1",
     mesFiltroInicial: Int? = null,
     modifier: Modifier = Modifier,
     onVolver: () -> Unit = {},
     onVerCalendario: () -> Unit = {},
-    onVerInicio: () -> Unit = {}
+    onVerInicio: () -> Unit = {},
+    onEditarTransaccion: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     val transacciones by viewModel.transacciones.collectAsState()
     val filtroActual by viewModel.filtroActual.collectAsState()
@@ -46,8 +47,9 @@ fun HistorialVista(
         }
     }
 
+    // Cargar transacciones al iniciar
     LaunchedEffect(mesFiltroInicial) {
-        viewModel.cargarTransacciones(usuarioId, mes = mesFiltroInicial)
+        viewModel.cargarTransacciones(usuarioId, mesFiltroInicial)
     }
 
     Box(
@@ -91,7 +93,7 @@ fun HistorialVista(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Filtros (Todos, Ingresos, Egresos)
+            // Filtros
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -162,7 +164,11 @@ fun HistorialVista(
                     items(transacciones) { transaccion ->
                         TransaccionCard(
                             transaccion = transaccion,
-                            formatoMoneda = formatoMoneda
+                            formatoMoneda = formatoMoneda,
+                            onClick = {
+                                // Llamar a la función de navegación
+                                onEditarTransaccion(transaccion.id, transaccion.esIngreso)
+                            }
                         )
                     }
 
@@ -173,15 +179,14 @@ fun HistorialVista(
             }
         }
 
-        // Barra de navegación inferior
-// Barra de navegación inferior
+        // --- BARRA DE NAVEGACIÓN INFERIOR ---
         Card(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 0.dp, vertical = 35.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(30.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -203,7 +208,11 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
+                    Text(
+                        text = "Calendario",
+                        color = TextSecondary,
+                        fontSize = 10.sp
+                    )
                 }
 
                 Column(
@@ -218,7 +227,11 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
+                    Text(
+                        text = "Inicio",
+                        color = TextSecondary,
+                        fontSize = 10.sp
+                    )
                 }
 
                 Column(
@@ -227,26 +240,30 @@ fun HistorialVista(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(56.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
-                    ){
+                    ) {
                         Icon(
                             imageVector = Icons.Default.List,
                             contentDescription = "Historial",
-                            tint = TextSecondary,
-                            modifier = Modifier.size(24.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Historial",
+                        color = TextPrimary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
-            //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
         }
     }
 }
-
-// --- Componibles Reutilizados (FiltroButton y TransaccionCard) ---
 
 @Composable
 fun FiltroButton(
@@ -266,7 +283,7 @@ fun FiltroButton(
     ) {
         Text(
             text = texto,
-            fontSize = if (seleccionado) 13.sp else 14.sp ,
+            fontSize = 14.sp,
             fontWeight = if (seleccionado) FontWeight.Bold else FontWeight.Normal
         )
     }
@@ -275,11 +292,14 @@ fun FiltroButton(
 @Composable
 fun TransaccionCard(
     transaccion: TransaccionItem,
-    formatoMoneda: NumberFormat
+    formatoMoneda: NumberFormat,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = CardDark),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }, // Hacer clickeable
+        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
