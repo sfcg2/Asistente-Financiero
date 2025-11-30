@@ -211,4 +211,8 @@ sketch
 .history
 .ionide
 
+.gradle/
+build/
+app/build/
+
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,git,java,visualstudiocode,intellij,react,firebase
