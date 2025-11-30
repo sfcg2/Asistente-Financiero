@@ -22,6 +22,7 @@ class AuthViewModel : ViewModel() {
     val errorMensaje = _errorMensaje.asStateFlow()
 
     fun registrar(
+        nombre:String,
         correo: String,
         contrasena: String,
         onSuccess: () -> Unit
@@ -42,7 +43,7 @@ class AuthViewModel : ViewModel() {
                 val userId = result.user?.uid ?: throw Exception("No se pudo obtener el ID del usuario")
 
                 // Crear documento del usuario en Firestore usando el Repository
-                val creado = usuarioRepository.crearUsuario(userId, correo)
+                val creado = usuarioRepository.crearUsuario(userId, nombre, correo)
                 if (!creado) {
                     // Si falla, eliminar el usuario de Auth
                     auth.currentUser?.delete()?.await()

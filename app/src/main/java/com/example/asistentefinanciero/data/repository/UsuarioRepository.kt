@@ -9,15 +9,15 @@ class UsuarioRepository() {
     private val coleccionDeUsuario = baseDedatos.collection("usuarios")
 
     // Crear usuario en Firestore cuando se registra
-    suspend fun crearUsuario(usuarioId: String, correo: String): Boolean {
+    suspend fun crearUsuario(usuarioId: String, nombre: String, correo: String): Boolean {
         return try {
             val usuario = hashMapOf(
                 "id" to usuarioId,
+                "nombre" to nombre,
                 "correo" to correo,
-                "nombre" to "",
-                "documentoIdentidad" to "",
-                "fechaNacimiento" to "",
-                "pais" to "",
+                //"documentoIdentidad" to "",
+                //"fechaNacimiento" to "",
+                //"pais" to "",
                 "saldo" to 0.0
             )
 

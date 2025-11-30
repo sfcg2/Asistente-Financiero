@@ -23,7 +23,10 @@ import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.HomeViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -41,12 +44,12 @@ fun HomeVista(
     onIrPerfil: () -> Unit = {},
     onIrSeguridad: () -> Unit = {},
     onIrNotificaciones: () -> Unit = {},
-    nombreUsuario: String = "Usuario",
+    //nombreUsuario: String = "Usuario",
     onIrTerminos: () -> Unit = {}
 ) {
     //val usuarioId = "K6Tr9DTjDIMGf7PFG4MH"
     val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    //val nombreUsuario = FirebaseAuth.getInstance().currentUser?.
+    var nombreUsuario by remember { mutableStateOf("Usuario") }
     var mesSeleccionado by remember { mutableStateOf("Mes") }
     var mostrarMenuMes by remember { mutableStateOf(false) }
     var mostrarMenuPerfil by remember { mutableStateOf(false) }
@@ -62,6 +65,9 @@ fun HomeVista(
 
     LaunchedEffect(usuarioId) {
         if(usuarioId.isNotEmpty()){
+            val db = FirebaseFirestore.getInstance()
+            val doc = db.collection("usuarios").document(usuarioId).get().await()
+            nombreUsuario = doc.getString("nombre") ?: "Usario"
             homeViewModel.cargarDatos(usuarioId)
             historialViewModel.cargarTransacciones(usuarioId, mes = null)
         }

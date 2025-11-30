@@ -20,6 +20,8 @@ import com.example.asistentefinanciero.viewmodel.EstadisticasViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.IngresoViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 enum class Pantalla {
     HOME,
@@ -48,7 +50,7 @@ fun AppNavigation(
     val historialViewModel: HistorialViewModel = viewModel() // Creamos el ViewModel una sola vez aquí
     val estadisticasViewModel: EstadisticasViewModel = viewModel()
     val authViewModel: AuthViewModel = viewModel()
-    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    //val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     val pantallaInicial = if (authViewModel.haySesionActiva()) {
         Pantalla.HOME
@@ -62,7 +64,6 @@ fun AppNavigation(
     when (navState.pantalla) {
         Pantalla.HOME -> {
             HomeVista(
-                nombreUsuario = FirebaseAuth.getInstance().currentUser?.email?.substringBefore("@") ?: "Usuario",
                 onRegistrarIngreso = { navState = NavState(Pantalla.REGISTRAR_INGRESO) },
                 onRegistrarEgreso = { navState = NavState(Pantalla.REGISTRAR_EGRESO) },
                 onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
