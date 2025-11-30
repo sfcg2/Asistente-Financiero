@@ -54,7 +54,7 @@ fun EstadisticaVista(
 
     // Cargar datos al iniciar
     LaunchedEffect(Unit) {
-        viewModel.cargarIngresos(usuarioId)
+        viewModel.cargarDatos(usuarioId)
     }
 
     Box(
