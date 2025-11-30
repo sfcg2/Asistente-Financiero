@@ -21,13 +21,14 @@ import com.example.asistentefinanciero.ui.theme.* // Asegúrate de que tus impor
 import com.example.asistentefinanciero.viewmodel.FiltroHistorial
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
+import com.google.firebase.auth.FirebaseAuth
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
 fun HistorialVista(
     viewModel: HistorialViewModel,
-    usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
+    //usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
     // ✨ MODIFICACIÓN CLAVE: Parámetro para recibir el filtro de mes.
     mesFiltroInicial: Int? = null,
     modifier: Modifier = Modifier,
@@ -35,6 +36,7 @@ fun HistorialVista(
     onVerCalendario: () -> Unit = {},
     onVerInicio: () -> Unit = {}
 ) {
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val transacciones by viewModel.transacciones.collectAsState()
     val filtroActual by viewModel.filtroActual.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()

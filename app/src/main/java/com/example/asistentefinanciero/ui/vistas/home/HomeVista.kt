@@ -23,6 +23,7 @@ import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.HomeViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
+import com.google.firebase.auth.FirebaseAuth
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -40,11 +41,12 @@ fun HomeVista(
     onIrPerfil: () -> Unit = {},
     onIrSeguridad: () -> Unit = {},
     onIrNotificaciones: () -> Unit = {},
-    nombreUsuario: String = "Carlos Sánchez",
+    nombreUsuario: String = "Usuario",
     onIrTerminos: () -> Unit = {}
 ) {
-    val usuarioId = "K6Tr9DTjDIMGf7PFG4MH"
-
+    //val usuarioId = "K6Tr9DTjDIMGf7PFG4MH"
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    //val nombreUsuario = FirebaseAuth.getInstance().currentUser?.
     var mesSeleccionado by remember { mutableStateOf("Mes") }
     var mostrarMenuMes by remember { mutableStateOf(false) }
     var mostrarMenuPerfil by remember { mutableStateOf(false) }
@@ -58,9 +60,12 @@ fun HomeVista(
     }
     val isLoadingTransacciones by historialViewModel.isLoading.collectAsState()
 
-    LaunchedEffect(Unit) {
-        homeViewModel.cargarDatos(usuarioId)
-        historialViewModel.cargarTransacciones(usuarioId, mes = null)
+    LaunchedEffect(usuarioId) {
+        if(usuarioId.isNotEmpty()){
+            homeViewModel.cargarDatos(usuarioId)
+            historialViewModel.cargarTransacciones(usuarioId, mes = null)
+        }
+
     }
 
     val formatoMoneda = remember {

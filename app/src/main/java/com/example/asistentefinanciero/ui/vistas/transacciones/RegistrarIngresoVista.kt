@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.IngresoViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,12 +31,14 @@ import java.util.*
 fun RegistrarIngresoVista(
     viewModel: IngresoViewModel,
     modifier: Modifier = Modifier,
-    usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
+    //usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
     onVolver: () -> Unit = {},
     onVerCalendario: () -> Unit = {},
     onVerInicio: () -> Unit = {},
     onVerHistorial: () -> Unit = {}
 ) {
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
     // Estados del ViewModel
     val cantidad by viewModel.cantidad.collectAsState()
     val categoria by viewModel.categoria.collectAsState()

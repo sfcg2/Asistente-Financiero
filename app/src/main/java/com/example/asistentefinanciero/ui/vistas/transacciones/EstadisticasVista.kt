@@ -29,6 +29,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import com.google.firebase.auth.FirebaseAuth
 import kotlin.math.sqrt
 import kotlin.math.atan2
 
@@ -36,7 +37,8 @@ import kotlin.math.atan2
 @Composable
 fun EstadisticaVista(
     viewModel: EstadisticasViewModel,
-    usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
+    //usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
+
     modifier: Modifier = Modifier,
     onVolver: () -> Unit = {},
     onVerCalendario: () -> Unit = {},
@@ -48,6 +50,7 @@ fun EstadisticaVista(
     val filtroActual by viewModel.filtroActual.collectAsState()
     val datosGrafico by viewModel.datosGrafico.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
     // Cargar datos al iniciar
     LaunchedEffect(Unit) {
