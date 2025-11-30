@@ -118,9 +118,9 @@ fun CalendarioVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(vertical = 35.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -136,20 +136,20 @@ fun CalendarioVista(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendario",
+                            contentDescription = "Movimientos",
                             tint = TextSecondary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
+                    //Text(text = "Movimientos", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -164,7 +164,7 @@ fun CalendarioVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
+                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -179,7 +179,7 @@ fun CalendarioVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
+                    //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }

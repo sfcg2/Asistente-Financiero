@@ -22,13 +22,13 @@ import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.FiltroHistorial
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
+import com.google.firebase.auth.FirebaseAuth
 import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
 fun HistorialVista(
     viewModel: HistorialViewModel,
-    usuarioId: String = "usuario1",
     mesFiltroInicial: Int? = null,
     modifier: Modifier = Modifier,
     onVolver: () -> Unit = {},
@@ -36,6 +36,7 @@ fun HistorialVista(
     onVerInicio: () -> Unit = {},
     onEditarTransaccion: (String, Boolean) -> Unit = { _, _ -> }
 ) {
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val transacciones by viewModel.transacciones.collectAsState()
     val filtroActual by viewModel.filtroActual.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -184,9 +185,9 @@ fun HistorialVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(vertical = 35.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -203,16 +204,12 @@ fun HistorialVista(
                     IconButton(onClick = onVerCalendario) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendario",
+                            contentDescription = "Movimientos",
                             tint = TextSecondary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Calendario",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                    //Text(text = "Movimientos", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -227,11 +224,7 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Inicio",
-                        color = TextSecondary,
-                        fontSize = 10.sp
-                    )
+                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -240,7 +233,7 @@ fun HistorialVista(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
@@ -249,16 +242,10 @@ fun HistorialVista(
                             imageVector = Icons.Default.List,
                             contentDescription = "Historial",
                             tint = Color.White,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Historial",
-                        color = TextPrimary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    //Text(text = "Historial", color = TextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

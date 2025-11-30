@@ -3,10 +3,8 @@ package com.example.asistentefinanciero.ui.vistas.home
 import com.example.asistentefinanciero.ui.componentes.MenuPerfilDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -23,6 +21,9 @@ import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.HomeViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
 import com.example.asistentefinanciero.viewmodel.TransaccionItem
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -40,11 +41,10 @@ fun HomeVista(
     onIrPerfil: () -> Unit = {},
     onIrSeguridad: () -> Unit = {},
     onIrNotificaciones: () -> Unit = {},
-    nombreUsuario: String = "Carlos Sánchez",
     onIrTerminos: () -> Unit = {}
 ) {
-    val usuarioId = "K6Tr9DTjDIMGf7PFG4MH"
-
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var nombreUsuario by remember { mutableStateOf("Usuario") }
     var mesSeleccionado by remember { mutableStateOf("Mes") }
     var mostrarMenuMes by remember { mutableStateOf(false) }
     var mostrarMenuPerfil by remember { mutableStateOf(false) }
@@ -58,10 +58,16 @@ fun HomeVista(
     }
     val isLoadingTransacciones by historialViewModel.isLoading.collectAsState()
 
-    LaunchedEffect(Unit) {
-        homeViewModel.cargarDatos(usuarioId)
-        historialViewModel.cargarTransacciones(usuarioId, mes = null)
+    LaunchedEffect(usuarioId) {
+        if(usuarioId.isNotEmpty()){
+            val db = FirebaseFirestore.getInstance()
+            val doc = db.collection("usuarios").document(usuarioId).get().await()
+            nombreUsuario = doc.getString("nombre") ?: "Usuario"
+            homeViewModel.cargarDatos(usuarioId)
+            historialViewModel.cargarTransacciones(usuarioId, mes = null)
+        }
     }
+
 
     val formatoMoneda = remember {
         NumberFormat.getNumberInstance(Locale("es", "CO")).apply {
@@ -82,14 +88,6 @@ fun HomeVista(
                 .padding(horizontal = 5.dp)
         ) {
             Spacer(modifier = Modifier.height(35.dp))
-
-            /*Text(
-                text = "INICIO",
-                fontSize = 14.sp,
-                color = TextSecondary,
-                fontWeight = FontWeight.Normal
-            )*/
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Card(
@@ -333,9 +331,9 @@ fun HomeVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(vertical = 35.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Row(
@@ -352,15 +350,12 @@ fun HomeVista(
                     IconButton(onClick = onVerCalendario) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendario",
+                            contentDescription = "Movimientos",
                             tint = TextSecondary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(
-                        text = "Calendario",
-                        color = TextSecondary,
-                        fontSize = 10.sp)
+                    //Text(text = "Movimientos", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -369,7 +364,7 @@ fun HomeVista(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(PrimaryPurple),
                         contentAlignment = Alignment.Center
@@ -381,7 +376,7 @@ fun HomeVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
+                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -396,7 +391,7 @@ fun HomeVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
+                    //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }

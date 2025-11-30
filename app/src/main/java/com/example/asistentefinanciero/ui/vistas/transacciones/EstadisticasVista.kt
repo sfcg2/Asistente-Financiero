@@ -28,26 +28,29 @@ import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun EstadisticaVista(
     viewModel: EstadisticasViewModel,
-    usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH",
     modifier: Modifier = Modifier,
     onVolver: () -> Unit = {},
     onVerCalendario: () -> Unit = {},
     onVerInicio: () -> Unit = {},
     onVerHistorial: () -> Unit = {},
 ) {
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     var mesSeleccionado by remember { mutableStateOf("Mes") }
     var mostrarMenuMes by remember { mutableStateOf(false) }
     val filtroActual by viewModel.filtroActual.collectAsState()
     val datosGrafico by viewModel.datosGrafico.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val seleccionGrafico by viewModel.seleccionGrafico.collectAsState()
+
 
     // Cargar datos al iniciar
     LaunchedEffect(Unit) {
-        viewModel.cargarDatos(usuarioId)
+        viewModel.inicializarCargaDeDatos(usuarioId)
     }
 
     Box(
@@ -285,6 +288,10 @@ fun EstadisticaVista(
                             // GRÁFICO CIRCULAR
                             GraficoCircular(
                                 datos = datosGrafico,
+                                categoriaSeleccionada = seleccionGrafico,
+                                onCategoriaSeleccionada = { nuevoDato ->
+                                    viewModel.setSeleccionGrafico(nuevoDato)
+                                },
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(24.dp)
@@ -417,13 +424,13 @@ fun ChipCategoria(
 //Componente del Gráfico Circular
 @Composable
 fun GraficoCircular(
+
     datos: List<com.example.asistentefinanciero.viewmodel.DatoGrafico>,
+    categoriaSeleccionada: com.example.asistentefinanciero.viewmodel.DatoGrafico?, // ✨ Nuevo parámetro de estado
+    onCategoriaSeleccionada: (com.example.asistentefinanciero.viewmodel.DatoGrafico?) -> Unit, // ✨ Nuevo callback de evento
     modifier: Modifier = Modifier
 ) {
     val totalMonto = datos.sumOf { it.montoTotal }
-
-    // ✨ Estado para rastrear qué categoría está seleccionada
-    var categoriaSeleccionada by remember { mutableStateOf<com.example.asistentefinanciero.viewmodel.DatoGrafico?>(null) }
 
     Box(
         modifier = modifier,
@@ -457,14 +464,14 @@ fun GraficoCircular(
                             datos.forEach { dato ->
                                 val sweepAngle = (dato.porcentajeTotal / 100f) * 360f
                                 if (angle >= currentAngle && angle < currentAngle + sweepAngle) {
-                                    categoriaSeleccionada = if (categoriaSeleccionada == dato) null else dato
+                                    onCategoriaSeleccionada(if (categoriaSeleccionada == dato) null else dato)
                                     return@detectTapGestures
                                 }
                                 currentAngle += sweepAngle
                             }
                         } else if (distance < innerRadius) {
                             // Si toca el centro, deseleccionar
-                            categoriaSeleccionada = null
+                            onCategoriaSeleccionada(null)
                         }
                     }
                 }

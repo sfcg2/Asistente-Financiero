@@ -3,7 +3,11 @@ package com.example.asistentefinanciero.ui.vistas.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,17 +22,16 @@ import com.example.asistentefinanciero.R
 import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.AuthViewModel
 
-
-
-
 @Composable
-fun LoginVista(
+fun RegisterVista(
     viewModel: AuthViewModel,
-    onLoginExitoso: () -> Unit,
-    onIrARegistro: () -> Unit
+    onRegistroExitoso: () -> Unit,
+    onIrALogin: () -> Unit
 ) {
+    var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
+    var confirmarContrasena by remember { mutableStateOf("") }
 
     val cargando by viewModel.cargando.collectAsState()
     val errorMensaje by viewModel.errorMensaje.collectAsState()
@@ -46,10 +49,29 @@ fun LoginVista(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Botón volver
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(onClick = {
+                    viewModel.limpiarError()
+                    onIrALogin()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Volver",
+                        tint = TextPrimary
+                    )
+                }
+            }
+
             // Logo
             Image(
                 painter = painterResource(id = R.drawable.logo), // Usa el nombre que le diste
@@ -59,7 +81,6 @@ fun LoginVista(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Título
             Box{
                 Text(
                     text = "Control",
@@ -75,9 +96,9 @@ fun LoginVista(
                 )
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Card blanca con inputs
+            // Card con formulario
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -89,7 +110,7 @@ fun LoginVista(
                         .padding(24.dp)
                 ) {
                     Text(
-                        text = "Bienvenido",
+                        text = "Crear Cuenta",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryPurple,
@@ -97,6 +118,31 @@ fun LoginVista(
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
+
+                    // Campo Nombre
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = {
+                            nombre = it
+                            viewModel.limpiarError()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Nombre", color = Color(0xFFB4B4B4)) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryPurple,
+                            unfocusedBorderColor = Color(0xFFE0E0E0),
+                            focusedContainerColor = Color(0xFFF5F5F5),
+                            unfocusedContainerColor = Color(0xFFF5F5F5),
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            cursorColor = PrimaryPurple
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = !cargando,
+                        singleLine = true,
+                        isError = errorMensaje != null
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Campo Correo
                     OutlinedTextField(
@@ -106,12 +152,7 @@ fun LoginVista(
                             viewModel.limpiarError()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text(
-                                "Correo",
-                                color = Color(0xFFB4B4B4)
-                            )
-                        },
+                        placeholder = { Text("Correo", color = Color(0xFFB4B4B4)) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryPurple,
                             unfocusedBorderColor = Color(0xFFE0E0E0),
@@ -137,12 +178,34 @@ fun LoginVista(
                             viewModel.limpiarError()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text(
-                                "Contraseña",
-                                color = Color(0xFFB4B4B4)
-                            )
+                        placeholder = { Text("Contraseña", color = Color(0xFFB4B4B4)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryPurple,
+                            unfocusedBorderColor = Color(0xFFE0E0E0),
+                            focusedContainerColor = Color(0xFFF5F5F5),
+                            unfocusedContainerColor = Color(0xFFF5F5F5),
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            cursorColor = PrimaryPurple
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = !cargando,
+                        singleLine = true,
+                        isError = errorMensaje != null
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Campo Confirmar Contraseña
+                    OutlinedTextField(
+                        value = confirmarContrasena,
+                        onValueChange = {
+                            confirmarContrasena = it
+                            viewModel.limpiarError()
                         },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Confirmar contraseña", color = Color(0xFFB4B4B4)) },
                         visualTransformation = PasswordVisualTransformation(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryPurple,
@@ -171,7 +234,7 @@ fun LoginVista(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Botón Ingresar
+                    // Botón Registrar
                     Button(
                         onClick = {
                             when {
@@ -181,9 +244,18 @@ fun LoginVista(
                                 contrasena.isBlank() -> {
                                     viewModel.setError("Ingrese su contraseña")
                                 }
+                                confirmarContrasena.isBlank() -> {
+                                    viewModel.setError("Confirme su contraseña")
+                                }
+                                contrasena != confirmarContrasena -> {
+                                    viewModel.setError("Las contraseñas no coinciden")
+                                }
+                                contrasena.length < 6 -> {
+                                    viewModel.setError("La contraseña debe tener al menos 6 caracteres")
+                                }
                                 else -> {
-                                    viewModel.login(correo, contrasena) {
-                                        onLoginExitoso()
+                                    viewModel.registrar(nombre, correo, contrasena) {
+                                        onRegistroExitoso()
                                     }
                                 }
                             }
@@ -204,7 +276,7 @@ fun LoginVista(
                             )
                         } else {
                             Text(
-                                text = "Ingresar",
+                                text = "Registrarse",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -215,15 +287,15 @@ fun LoginVista(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Link Registrarse
+            // Link Iniciar sesión
             TextButton(
                 onClick = {
                     viewModel.limpiarError()
-                    onIrARegistro()
+                    onIrALogin()
                 }
             ) {
                 Text(
-                    text = "¿Aún no tienes cuenta? Registrate",
+                    text = "¿Ya tienes cuenta? Inicia sesión",
                     color = TextPrimary,
                     fontSize = 16.sp
                 )

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asistentefinanciero.ui.theme.*
 import com.example.asistentefinanciero.viewmodel.EditarTransaccionViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,12 +28,13 @@ import java.util.*
 @Composable
 fun EditarTransaccionVista(
     viewModel: EditarTransaccionViewModel,
-    usuarioId: String,
     transaccionId: String,
     esIngreso: Boolean,
     modifier: Modifier = Modifier,
     onVolver: () -> Unit = {}
 ) {
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
     // Estados del ViewModel
     val cantidad by viewModel.cantidad.collectAsState()
     val categoria by viewModel.categoria.collectAsState()
@@ -71,7 +73,7 @@ fun EditarTransaccionVista(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
         ) {
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -102,7 +104,7 @@ fun EditarTransaccionVista(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Icono y título
             Column(
@@ -202,7 +204,7 @@ fun EditarTransaccionVista(
                     DropdownMenu(
                         expanded = mostrarMenuCategoria,
                         onDismissRequest = { mostrarMenuCategoria = false },
-                        modifier = Modifier.background(SurfaceDark)
+                        modifier = Modifier.background(SurfaceDark).size(200.dp)
                     ) {
                         val categorias = if (esIngreso) {
                             listOf(
@@ -279,7 +281,7 @@ fun EditarTransaccionVista(
                     OutlinedTextField(
                         value = hora,
                         onValueChange = {},
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(0.8f),
                         readOnly = true,
                         placeholder = { Text("Hora", color = Color(0xFFB4B4B4)) },
                         colors = OutlinedTextFieldDefaults.colors(

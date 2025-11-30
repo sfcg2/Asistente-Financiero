@@ -9,10 +9,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarEgresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.HistorialVista
 import com.example.asistentefinanciero.ui.vistas.home.HomeVista
+import com.example.asistentefinanciero.ui.vistas.login.LoginVista
+import com.example.asistentefinanciero.ui.vistas.login.RegisterVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.RegistrarIngresoVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.CalendarioVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.EstadisticaVista
 import com.example.asistentefinanciero.ui.vistas.transacciones.EditarTransaccionVista
+import com.example.asistentefinanciero.viewmodel.AuthViewModel
 import com.example.asistentefinanciero.viewmodel.EgresoViewModel
 import com.example.asistentefinanciero.viewmodel.EstadisticasViewModel
 import com.example.asistentefinanciero.viewmodel.HistorialViewModel
@@ -21,6 +24,8 @@ import com.example.asistentefinanciero.viewmodel.EditarTransaccionViewModel
 
 enum class Pantalla {
     HOME,
+    LOGIN,
+    REGISTER,
     REGISTRAR_INGRESO,
     REGISTRAR_EGRESO,
     HISTORIAL,
@@ -28,7 +33,6 @@ enum class Pantalla {
     CALENDARIO,
     ESTADISTICAS
 }
-
 data class NavState(
     val pantalla: Pantalla,
     val mesFiltro: Int? = null, // Argumento para filtrar el historial por mes (1-12)
@@ -38,22 +42,38 @@ data class NavState(
 
 @Composable
 fun AppNavigation(
-    usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH"
+    //usuarioId: String = "K6Tr9DTjDIMGf7PFG4MH"
 ) {
-    var navState by remember { mutableStateOf(NavState(Pantalla.HOME)) }
+
     val historialViewModel: HistorialViewModel = viewModel() // Creamos el ViewModel una sola vez aquí
     val estadisticasViewModel: EstadisticasViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
+
+    //Verificamos que el usuario tenga sesión activa y lo redireccionamos al HOME en vez de logout-in
+
+    val pantallaInicial = if (authViewModel.haySesionActiva()) {
+        Pantalla.HOME
+    } else {
+        Pantalla.LOGIN
+    }
+    var navState by remember { mutableStateOf(NavState(pantallaInicial)) }
 
     when (navState.pantalla) {
+
         Pantalla.HOME -> {
             HomeVista(
                 onRegistrarIngreso = { navState = NavState(Pantalla.REGISTRAR_INGRESO) },
                 onRegistrarEgreso = { navState = NavState(Pantalla.REGISTRAR_EGRESO) },
                 onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
                 onVerEstadisticas = { navState = NavState(Pantalla.ESTADISTICAS) },
+
                 // Cuando vamos al historial desde el Home, el filtro de mes es NULL (todos)
                 onVerHistorial = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = null) },
-                onCerrarSesion = { /* Implementar logout */ },
+
+                onCerrarSesion = {authViewModel.logout()
+                        navState = NavState(Pantalla.LOGIN) },
+
+                // No implementado (no estan en los requisitos)
                 onIrPerfil = { /* Implementar perfil */ },
                 onIrSeguridad = { /* Implementar seguridad */ },
                 onIrNotificaciones = { /* Implementar notificaciones */ },
@@ -61,11 +81,27 @@ fun AppNavigation(
             )
         }
 
+        Pantalla.LOGIN -> {
+            LoginVista(
+                viewModel = authViewModel,
+                onLoginExitoso = {navState = NavState(Pantalla.HOME)},
+                onIrARegistro = {navState = NavState(Pantalla.REGISTER)}
+            )
+        }
+
+        Pantalla.REGISTER -> {
+            RegisterVista(
+                viewModel = authViewModel,
+                onRegistroExitoso = {navState = NavState(Pantalla.HOME)},
+                onIrALogin = {navState = NavState(Pantalla.LOGIN)}
+            )
+        }
+
         Pantalla.REGISTRAR_INGRESO -> {
             val viewModel: IngresoViewModel = viewModel()
             RegistrarIngresoVista(
                 viewModel = viewModel,
-                usuarioId = usuarioId,
+                //usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
                 onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
                 onVerInicio = { navState = NavState(Pantalla.HOME) },
@@ -77,7 +113,7 @@ fun AppNavigation(
             val viewModel: EgresoViewModel = viewModel()
             RegistrarEgresoVista(
                 viewModel = viewModel,
-                usuarioId = usuarioId,
+                //usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
                 onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
                 onVerInicio = { navState = NavState(Pantalla.HOME) },
@@ -88,7 +124,7 @@ fun AppNavigation(
         Pantalla.HISTORIAL -> {
             HistorialVista(
                 viewModel = historialViewModel,
-                usuarioId = usuarioId,
+                //usuarioId = usuarioId,
                 // Le pasamos el filtro de mes actual al Composable
                 mesFiltroInicial = navState.mesFiltro,
                 onVolver = { navState = NavState(Pantalla.HOME) },
@@ -108,7 +144,6 @@ fun AppNavigation(
             val viewModel: EditarTransaccionViewModel = viewModel()
             EditarTransaccionVista(
                 viewModel = viewModel,
-                usuarioId = usuarioId,
                 transaccionId = navState.transaccionId,
                 esIngreso = navState.esIngreso,
                 onVolver = { navState = NavState(Pantalla.HISTORIAL, mesFiltro = navState.mesFiltro) }
@@ -129,7 +164,7 @@ fun AppNavigation(
         Pantalla.ESTADISTICAS -> {
             EstadisticaVista(
                 viewModel = estadisticasViewModel,
-                usuarioId = usuarioId,
+                //usuarioId = usuarioId,
                 onVolver = { navState = NavState(Pantalla.HOME) },
                 onVerCalendario = { navState = NavState(Pantalla.CALENDARIO) },
                 onVerInicio = { navState = NavState(Pantalla.HOME) },
