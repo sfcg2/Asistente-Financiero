@@ -214,5 +214,6 @@ sketch
 .gradle/
 build/
 app/build/
+.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,git,java,visualstudiocode,intellij,react,firebase
