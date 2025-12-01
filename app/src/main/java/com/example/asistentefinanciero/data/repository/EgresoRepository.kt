@@ -2,11 +2,13 @@ package com.example.asistentefinanciero.data.repository
 
 import com.example.asistentefinanciero.data.model.Egreso
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 
 class EgresoRepository {
     private val baseDeDatos = FirebaseFirestore.getInstance()
+    private var listenerRegistration: ListenerRegistration? = null // ✅ NUEVO
 
     suspend fun guardarEgreso(usuarioId: String, egreso: Egreso): Boolean {
         return try {
@@ -21,8 +23,12 @@ class EgresoRepository {
         }
     }
 
-    fun obtenerEgresos(usuarioId: String, onResult: (List<Egreso>) -> Unit) {
-        baseDeDatos.collection("usuarios")
+    // ✅ MODIFICADO: Retorna el listener para poder cancelarlo
+    fun obtenerEgresos(usuarioId: String, onResult: (List<Egreso>) -> Unit): ListenerRegistration {
+        // Cancelar listener anterior si existe
+        listenerRegistration?.remove()
+
+        listenerRegistration = baseDeDatos.collection("usuarios")
             .document(usuarioId)
             .collection("egresos")
             .orderBy("fecha", Query.Direction.DESCENDING)
@@ -38,6 +44,14 @@ class EgresoRepository {
 
                 onResult(egresos)
             }
+
+        return listenerRegistration!!
+    }
+
+    // ✅ NUEVO: Método para cancelar listener
+    fun cancelarListener() {
+        listenerRegistration?.remove()
+        listenerRegistration = null
     }
 
     // Nueva función para actualizar egreso

@@ -161,4 +161,10 @@ class HistorialViewModel : ViewModel() {
         hora = this.obtenerHoraFormateada(),
         esIngreso = esIngreso
     )
+
+    override fun onCleared() {
+        super.onCleared()
+        ingresoRepository.cancelarListener()
+        egresoRepository.cancelarListener()
+    }
 }
