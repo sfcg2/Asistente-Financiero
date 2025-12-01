@@ -3,12 +3,14 @@ package com.example.asistentefinanciero.data.repository
 import com.example.asistentefinanciero.data.model.Ingreso
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
 class IngresoRepository {
     private val baseDeDatos = FirebaseFirestore.getInstance()
+    private var listenerRegistration: ListenerRegistration? = null // ✅ NUEVO
 
     suspend fun guardarIngreso(usuarioId: String, ingreso: Ingreso): Boolean {
         return try {
@@ -23,8 +25,12 @@ class IngresoRepository {
         }
     }
 
-    fun obtenerIngresos(usuarioId: String, onResult: (List<Ingreso>) -> Unit) {
-        baseDeDatos.collection("usuarios")
+    // ✅ MODIFICADO: Retorna el listener para poder cancelarlo
+    fun obtenerIngresos(usuarioId: String, onResult: (List<Ingreso>) -> Unit): ListenerRegistration {
+        // Cancelar listener anterior si existe
+        listenerRegistration?.remove()
+
+        listenerRegistration = baseDeDatos.collection("usuarios")
             .document(usuarioId)
             .collection("ingresos")
             .orderBy("fecha", Query.Direction.DESCENDING)
@@ -40,6 +46,14 @@ class IngresoRepository {
 
                 onResult(ingresos)
             }
+
+        return listenerRegistration!!
+    }
+
+    // ✅ NUEVO: Método para cancelar listener
+    fun cancelarListener() {
+        listenerRegistration?.remove()
+        listenerRegistration = null
     }
 
     // Nueva función para actualizar ingreso

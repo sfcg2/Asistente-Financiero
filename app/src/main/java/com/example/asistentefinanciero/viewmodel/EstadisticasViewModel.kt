@@ -252,4 +252,10 @@ class EstadisticasViewModel : ViewModel() {
             }
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        ingresoRepository.cancelarListener()
+        egresoRepository.cancelarListener()
+    }
 }

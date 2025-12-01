@@ -50,6 +50,7 @@ fun HomeVista(
     var mostrarMenuPerfil by remember { mutableStateOf(false) }
 
     val saldo by homeViewModel.saldoActual.collectAsState()
+    val isLoadingHome by homeViewModel.isLoading.collectAsState()
 
     // OBTENER TRANSACCIONES Y FILTRAR A LAS ÚLTIMAS DOS
     val todasLasTransacciones by historialViewModel.transacciones.collectAsState()
@@ -63,7 +64,11 @@ fun HomeVista(
             val db = FirebaseFirestore.getInstance()
             val doc = db.collection("usuarios").document(usuarioId).get().await()
             nombreUsuario = doc.getString("nombre") ?: "Usuario"
+
+            // Solo cargar saldo en HomeViewModel
             homeViewModel.cargarDatos(usuarioId)
+
+            // HistorialViewModel carga las transacciones (evita duplicación)
             historialViewModel.cargarTransacciones(usuarioId, mes = null)
         }
     }
@@ -212,20 +217,32 @@ fun HomeVista(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "\$ ${formatoMoneda.format(saldo)}",
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
-                        Text(
-                            text = "Saldo actual",
-                            fontSize = 14.sp,
-                            color = TextSecondary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(60.dp)) // Separación grande después del saldo
+                        if (isLoadingHome) {
+                            // ✅ NUEVO: Mostrar indicador mientras carga
+                            CircularProgressIndicator(
+                                color = PrimaryPurple,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Cargando saldo...",
+                                fontSize = 14.sp,
+                                color = TextSecondary
+                            )
+                        } else {
+                            Text(
+                                text = "\$ ${formatoMoneda.format(saldo)}",
+                                fontSize = 48.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Text(
+                                text = "Saldo actual",
+                                fontSize = 14.sp,
+                                color = TextSecondary
+                            )
+                        }
+                    } // Separación grande después del saldo
 
                     // --- INICIO: ÚLTIMAS DOS TRANSACCIONES ---
                     Text(
