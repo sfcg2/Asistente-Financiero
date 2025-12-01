@@ -474,7 +474,7 @@ fun RegistrarEgresoVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 0.dp, vertical = 10.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)

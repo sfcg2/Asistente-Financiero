@@ -185,7 +185,7 @@ fun HistorialVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(vertical = 35.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
@@ -204,12 +204,12 @@ fun HistorialVista(
                     IconButton(onClick = onVerCalendario) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Movimientos",
+                            contentDescription = "Calendario",
                             tint = TextSecondary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Movimientos", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -224,7 +224,7 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -245,7 +245,7 @@ fun HistorialVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Historial", color = TextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "Historial", color = TextPrimary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

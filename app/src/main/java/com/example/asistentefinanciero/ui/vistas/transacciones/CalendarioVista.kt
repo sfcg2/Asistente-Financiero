@@ -118,7 +118,7 @@ fun CalendarioVista(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(vertical = 35.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             colors = CardDefaults.cardColors(containerColor = SurfaceDark),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp)
@@ -143,13 +143,13 @@ fun CalendarioVista(
                     ) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Movimientos",
+                            contentDescription = "Calenndario",
                             tint = TextSecondary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    //Text(text = "Movimientos", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Calendario", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -164,7 +164,7 @@ fun CalendarioVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Inicio", color = TextSecondary, fontSize = 10.sp)
                 }
 
                 Column(
@@ -179,7 +179,7 @@ fun CalendarioVista(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                    //Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
+                    Text(text = "Historial", color = TextSecondary, fontSize = 10.sp)
                 }
             }
         }
