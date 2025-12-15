@@ -1,5 +1,6 @@
 package com.example.asistentefinanciero
 
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.asistentefinanciero.viewmodel.EstadisticasViewModel
 import com.example.asistentefinanciero.data.model.Egreso
@@ -11,6 +12,8 @@ import com.google.firebase.Timestamp
 import io.mockk.every
 import io.mockk.invoke
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -36,6 +39,10 @@ class EstadisticasViewModelTest {
     fun setup() {
         Dispatchers.setMain(dispatcher)
 
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
+        every { Log.e(any(), any(), any()) } returns 0
+
         ingresoRepository = mockk()
         egresoRepository = mockk()
 
@@ -48,6 +55,7 @@ class EstadisticasViewModelTest {
 
     @After
     fun tearDown() {
+        unmockkStatic(Log::class)
         Dispatchers.resetMain()
     }
 

@@ -132,7 +132,7 @@ fun EstadisticaVista(
                             onClick = {
                                 mesSeleccionado = "Todos los meses"
                                 mostrarMenuMes = false
-                                viewModel.seleccionarMes(null)
+                                viewModel.seleccionarMes(null, usuarioId)
                             }
                         )
                         listOf(
@@ -144,7 +144,7 @@ fun EstadisticaVista(
                                 onClick = {
                                     mesSeleccionado = mes
                                     mostrarMenuMes = false
-                                    viewModel.seleccionarMes(index + 1)
+                                    viewModel.seleccionarMes(index + 1, usuarioId)
                                 }
                             )
                         }
