@@ -14,9 +14,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class IngresoViewModel : ViewModel() {
-    private val ingresoRepository = IngresoRepository()
-    private val usuarioRepository = UsuarioRepository()
+class IngresoViewModel(
+    private val ingresoRepository: IngresoRepository = IngresoRepository(),
+    private val usuarioRepository: UsuarioRepository = UsuarioRepository()
+) : ViewModel() {
 
     // Estados del formulario
     private val _cantidad = MutableStateFlow("")
@@ -37,7 +38,7 @@ class IngresoViewModel : ViewModel() {
     private val _seRepite = MutableStateFlow("No se repite")
     val seRepite: StateFlow<String> = _seRepite.asStateFlow()
 
-    // Estados de UI
+    // Estados UI
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -47,42 +48,26 @@ class IngresoViewModel : ViewModel() {
     private val _mensajeExito = MutableStateFlow<String?>(null)
     val mensajeExito: StateFlow<String?> = _mensajeExito.asStateFlow()
 
-    // Funciones para actualizar estados
-    fun actualizarCantidad(value: String) {
-        _cantidad.value = value
-    }
+    // === funciones que usa la UI (NO SE TOCAN) ===
 
-    fun actualizarCategoria(value: String) {
-        _categoria.value = value
-    }
-
-    fun actualizarFecha(value: String) {
-        _fecha.value = value
-    }
-
-    fun actualizarHora(value: String) {
-        _hora.value = value
-    }
-
-    fun actualizarNombre(value: String) {
-        _nombre.value = value
-    }
-
-    fun actualizarSeRepite(value: String) {
-        _seRepite.value = value
-    }
+    fun actualizarCantidad(value: String) { _cantidad.value = value }
+    fun actualizarCategoria(value: String) { _categoria.value = value }
+    fun actualizarFecha(value: String) { _fecha.value = value }
+    fun actualizarHora(value: String) { _hora.value = value }
+    fun actualizarNombre(value: String) { _nombre.value = value }
+    fun actualizarSeRepite(value: String) { _seRepite.value = value }
 
     fun limpiarMensaje() {
         _mensaje.value = null
         _mensajeExito.value = null
     }
 
+    // ============================
+
     private fun convertirStringATimestamp(fecha: String, hora: String): Timestamp? {
         return try {
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-            val fechaCompleta = "$fecha $hora"
-            val date = dateFormat.parse(fechaCompleta)
-            date?.let { Timestamp(it) }
+            val df = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+            df.parse("$fecha $hora")?.let { Timestamp(it) }
         } catch (e: Exception) {
             null
         }
@@ -90,7 +75,7 @@ class IngresoViewModel : ViewModel() {
 
     fun guardarIngreso(usuarioId: String) {
         viewModelScope.launch {
-            // Validaciones
+
             if (_cantidad.value.isEmpty()) {
                 _mensaje.value = "La cantidad es requerida"
                 return@launch
@@ -117,13 +102,11 @@ class IngresoViewModel : ViewModel() {
                 return@launch
             }
 
-            // Validar formato de fecha
             if (!validarFormatoFecha(_fecha.value)) {
                 _mensaje.value = "Formato de fecha inválido. Usa dd/MM/yyyy"
                 return@launch
             }
 
-            // Validar formato de hora
             if (!validarFormatoHora(_hora.value)) {
                 _mensaje.value = "Formato de hora inválido. Usa HH:mm"
                 return@launch
@@ -133,12 +116,9 @@ class IngresoViewModel : ViewModel() {
             _mensaje.value = null
 
             try {
-                // Convertir fecha y hora a Timestamp
                 val timestamp = convertirStringATimestamp(_fecha.value, _hora.value)
-
                 if (timestamp == null) {
                     _mensaje.value = "Error al procesar la fecha y hora"
-                    _isLoading.value = false
                     return@launch
                 }
 
@@ -149,23 +129,21 @@ class IngresoViewModel : ViewModel() {
                     categoria = _categoria.value,
                     fecha = timestamp,
                     seRepite = _seRepite.value != "No se repite",
-                    frecuenciaRepeticion = if (_seRepite.value != "No se repite") _seRepite.value else ""
+                    frecuenciaRepeticion =
+                        if (_seRepite.value != "No se repite") _seRepite.value else ""
                 )
 
-                // Guardar ingreso
                 val guardado = ingresoRepository.guardarIngreso(usuarioId, ingreso)
 
                 if (guardado) {
-                    // Actualizar saldo del usuario
                     usuarioRepository.incrementarSaldo(usuarioId, cantidadDouble)
-
-                    _mensajeExito.value = "Ingreso guardado exitosamente. Saldo actualizado."
-
-                    // Limpiar formulario
+                    _mensajeExito.value =
+                        "Ingreso guardado exitosamente. Saldo actualizado."
                     limpiarFormulario()
                 } else {
                     _mensaje.value = "Error al guardar el ingreso"
                 }
+
             } catch (e: Exception) {
                 _mensaje.value = "Error: ${e.message}"
             } finally {
@@ -175,34 +153,11 @@ class IngresoViewModel : ViewModel() {
     }
 
     private fun validarFormatoFecha(fecha: String): Boolean {
-        return try {
-            val regex = Regex("^\\d{2}/\\d{2}/\\d{4}$")
-            if (!regex.matches(fecha)) return false
-
-            val partes = fecha.split("/")
-            val dia = partes[0].toInt()
-            val mes = partes[1].toInt()
-            val anio = partes[2].toInt()
-
-            dia in 1..31 && mes in 1..12 && anio >= 2000
-        } catch (e: Exception) {
-            false
-        }
+        return Regex("^\\d{2}/\\d{2}/\\d{4}$").matches(fecha)
     }
 
     private fun validarFormatoHora(hora: String): Boolean {
-        return try {
-            val regex = Regex("^\\d{2}:\\d{2}$")
-            if (!regex.matches(hora)) return false
-
-            val partes = hora.split(":")
-            val horas = partes[0].toInt()
-            val minutos = partes[1].toInt()
-
-            horas in 0..23 && minutos in 0..59
-        } catch (e: Exception) {
-            false
-        }
+        return Regex("^\\d{2}:\\d{2}$").matches(hora)
     }
 
     private fun limpiarFormulario() {
