@@ -8,6 +8,8 @@ import com.example.asistentefinanciero.data.model.Egreso
 import com.example.asistentefinanciero.data.model.Ingreso
 import com.example.asistentefinanciero.data.repository.EgresoRepository
 import com.example.asistentefinanciero.data.repository.IngresoRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,10 +32,11 @@ data class DatoGrafico(
     val color: Color
 )
 
-class EstadisticasViewModel : ViewModel() {
-
-    private val ingresoRepository = IngresoRepository()
-    private val egresoRepository = EgresoRepository()
+class EstadisticasViewModel(
+    private val ingresoRepository: IngresoRepository = IngresoRepository(),
+    private val egresoRepository: EgresoRepository = EgresoRepository(),
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Main
+) : ViewModel() {
 
 
     // Estado del filtro actual (Ingresos o Egresos)
@@ -62,6 +65,7 @@ class EstadisticasViewModel : ViewModel() {
     private var currentUserId: String? = null
 
 
+
     //cargamos todos los datos de una sola vez
 
     fun inicializarCargaDeDatos(usuarioId: String) {
@@ -72,25 +76,24 @@ class EstadisticasViewModel : ViewModel() {
     }
     //carga ingresos y egresos a la vez
     private fun cargarDatos(usuarioId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             _isLoading.value = true
-            Log.d("EstadisticasViewModel", "Cargando TODOS los datos para el usuario: $usuarioId")
 
-            // Carga ingresos
             ingresoRepository.obtenerIngresos(usuarioId) { ingresos ->
                 todosLosIngresos = ingresos
-                // No actualizamos el gráfico aquí todavía
+                actualizarDatosGrafico()
+                _isLoading.value = false
             }
 
-            // Carga egresos
             egresoRepository.obtenerEgresos(usuarioId) { egresos ->
                 todosLosEgresos = egresos
-                // Una vez ambos están cargados, actualizamos el gráfico inicial
                 actualizarDatosGrafico()
                 _isLoading.value = false
             }
         }
     }
+
+
 
 
     //Cambia el filtro entre Ingresos y Egresos

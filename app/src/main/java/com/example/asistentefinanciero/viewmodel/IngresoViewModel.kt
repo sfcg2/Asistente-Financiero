@@ -14,9 +14,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class IngresoViewModel : ViewModel() {
-    private val ingresoRepository = IngresoRepository()
-    private val usuarioRepository = UsuarioRepository()
+class IngresoViewModel(
+    private val ingresoRepository: IngresoRepository = IngresoRepository(),
+    private val usuarioRepository: UsuarioRepository = UsuarioRepository()
+) : ViewModel() {
 
     // Estados del formulario
     private val _cantidad = MutableStateFlow("")
